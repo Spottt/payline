@@ -30,6 +30,91 @@ const CURRENCIES = {
     GBP: 826
 };
 
+
+const defaultBody = {
+    version: 20,
+    // contractNumber,
+    selectedContractList: [],
+    updatePersonalDetails: 0,
+    buyer: {
+        // title: null,
+        // lastName: null,
+        // firstName: null,
+        // email: null,
+        shippingAddress: {
+        //     title: null,
+        //     name: null,
+        //     firstName: null,
+        //     lastName: null,
+        //     street1: null,
+        //     street2: null,
+        //     cityName: null,
+        //     zipCode: null,
+        //     country: null,
+        //     phone: null,
+        //     state: null,
+        //     county: null,
+        //     phoneType: null
+        },
+        billingAddress: {
+        //     title: null,
+        //     name: null,
+        //     firstName: null,
+        //     lastName: null,
+        //     street1: null,
+        //     street2: null,
+        //     cityName: null,
+        //     zipCode: null,
+        //     country: null,
+        //     phone: null,
+        //     state: null,
+        //     county: null,
+        //     phoneType: null
+        }
+        // accountCreateDate: null,
+        // accountAverageAmount: null,
+        // accountOrderCount: null,
+        // walletId
+        // walletDisplayed: null,
+        // walletSecured: null,
+        // walletCardInd: null,
+        // ip: null,
+        // mobilePhone: null,
+        // customerId: null,
+        // legalStatus: null,
+        // legalDocument: null,
+        // birthDate: null,
+        // fingerprintID: null,
+        // isBot: null,
+        // isIncognito: null,
+        // isBehindProxy: null,
+        // isFromTor: null,
+        // isEmulator: null,
+        // isRooted: null,
+        // hasTimezoneMismatch: null
+    },
+    owner: {
+        // lastName: null,
+        // firstName: null,
+        billingAddress: {
+            // street: null,
+            // cityName: null,
+            // zipCode: null,
+            // country: null,
+            // phone: null
+        }
+        // issueCardDate: null
+    }
+    // returnURL: null,
+    // cancelURL: null,
+    // notificationURL: null,
+    // customPaymentPageCode: null,
+    // privateDataList: null,
+    // customPaymentTemplateURL: null,
+    // contractNumberWalletList: null,
+    // merchantName: null
+};
+
 export default class Payline {
 
     constructor(user, pass, contractNumber, wsdl = DEFAULT_WSDL) {
@@ -94,103 +179,92 @@ export default class Payline {
 
     // We get SOAP errors if nested objects are not initialized.
     manageWebWallet(walletId) {
+        const firstName = 'Augustin';
+        const lastName = 'Spottt';
+        const contractNumber = this.contractNumber;
+
         const requestBody = {
-            version: 20,
-            contractNumber: this.contractNumber,
-            selectedContractList: [
-                {
-                    selectedContract: this.contractNumber
-                }
-            ],
-            updatePersonalDetails: 1,
+            ...defaultBody,
             buyer: {
-                // title: null,
-                lastName: 'JavaScript',
-                firstName: 'Spottt',
-                // email: null,
-                shippingAddress: {
-                //     title: null,
-                //     name: null,
-                //     firstName: null,
-                //     lastName: null,
-                //     street1: null,
-                //     street2: null,
-                //     cityName: null,
-                //     zipCode: null,
-                //     country: null,
-                //     phone: null,
-                //     state: null,
-                //     county: null,
-                //     phoneType: null
-                },
-                billingAddress: {
-                //     title: null,
-                //     name: null,
-                //     firstName: null,
-                //     lastName: null,
-                //     street1: null,
-                //     street2: null,
-                //     cityName: null,
-                //     zipCode: null,
-                //     country: null,
-                //     phone: null,
-                //     state: null,
-                //     county: null,
-                //     phoneType: null
-                },
-                // accountCreateDate: null,
-                // accountAverageAmount: null,
-                // accountOrderCount: null,
+                ...defaultBody.buyer,
+                firstName,
+                lastName,
                 walletId
-                // walletDisplayed: null,
-                // walletSecured: null,
-                // walletCardInd: null,
-                // ip: null,
-                // mobilePhone: null,
-                // customerId: null,
-                // legalStatus: null,
-                // legalDocument: null,
-                // birthDate: null,
-                // fingerprintID: null,
-                // isBot: null,
-                // isIncognito: null,
-                // isBehindProxy: null,
-                // isFromTor: null,
-                // isEmulator: null,
-                // isRooted: null,
-                // hasTimezoneMismatch: null
             },
-            owner: {
-                lastName: 'JavaScript',
-                firstName: 'Spottt',
-                billingAddress: {
-                    // street: null,
-                    // cityName: null,
-                    // zipCode: null,
-                    // country: null,
-                    // phone: null
-                }
-                // issueCardDate: null
-            },
-            languageCode: 'eng',
-            securityMode: 'SSL',
-            returnURL: 'https://www.google.com?success',
-            cancelURL: 'https://www.google.com?cancel'
-            // customPaymentPageCode: null,
-            // notificationURL: null,
-            // privateDataList: null,
-            // customPaymentTemplateURL: null,
-            // contractNumberWalletList: null,
-            // merchantName: null
+            contractNumber,
+            selectedContractList: [
+                { selectedContract: contractNumber }
+            ],
+            returnURL: 'https://www.google.com/?returnURL',
+            cancelURL: 'https://www.google.com/?cancelURL'
         };
         return this.initialize()
-            // .then(client => client.manageWebWalletAsync(requestBody));
             .then(client => Promise.fromNode(callback => {
                 client.manageWebWallet(requestBody, callback);
             }))
             .spread((result, response) => {
                 if (isSuccessful(result.result)) {
                     return result.redirectURL;
+                }
+
+                throw result;
+            }, parseErrors);
+    }
+
+    doImmediateWalletPayment(walletId, amount) {
+        const firstName = 'Augustin';
+        const lastName = 'Spottt';
+        const email = 'augustin@spottt.fr';
+        const contractNumber = this.contractNumber;
+        const ref = walletId;
+        const date = formatNow();
+        const currency = '978'; // Euros
+        const deliveryMode = '5'; // electronic ticketing
+        const mode = 'CPT';
+        const action = 100;
+        const country = 'FR';
+
+        const payment = {
+            amount,
+            currency,
+            action,
+            mode,
+            contractNumber
+        };
+
+        const order = {
+            ref,
+            country,
+            amount,
+            currency,
+            date,
+            details: {},
+            deliveryMode
+        };
+
+        const requestBody = {
+            version: 20,
+            payment,
+            order,
+            buyer: {
+                ...defaultBody.buyer,
+                firstName,
+                lastName,
+                email,
+                walletId
+            },
+            walletId,
+            privateDataList: {},
+            authentication3DSecure: {},
+            subMerchant: {}
+        };
+        return this.initialize()
+            .then(client => Promise.fromNode(callback => {
+                client.doImmediateWalletPayment(requestBody, callback);
+            }))
+            .spread((result, response) => {
+                if (isSuccessful(result.result)) {
+                    return result;
                 }
 
                 throw result;
