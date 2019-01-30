@@ -91,6 +91,112 @@ export default class Payline {
         return this.createOrUpdateWallet.apply(this, [walletId, card, false]);
     }
 
+
+    // We get SOAP errors if nested objects are not initialized.
+    manageWebWallet(walletId) {
+        const requestBody = {
+            version: 20,
+            contractNumber: this.contractNumber,
+            selectedContractList: [
+                {
+                    selectedContract: this.contractNumber
+                }
+            ],
+            updatePersonalDetails: 1,
+            buyer: {
+                // title: null,
+                lastName: 'JavaScript',
+                firstName: 'Spottt',
+                // email: null,
+                shippingAddress: {
+                //     title: null,
+                //     name: null,
+                //     firstName: null,
+                //     lastName: null,
+                //     street1: null,
+                //     street2: null,
+                //     cityName: null,
+                //     zipCode: null,
+                //     country: null,
+                //     phone: null,
+                //     state: null,
+                //     county: null,
+                //     phoneType: null
+                },
+                billingAddress: {
+                //     title: null,
+                //     name: null,
+                //     firstName: null,
+                //     lastName: null,
+                //     street1: null,
+                //     street2: null,
+                //     cityName: null,
+                //     zipCode: null,
+                //     country: null,
+                //     phone: null,
+                //     state: null,
+                //     county: null,
+                //     phoneType: null
+                },
+                // accountCreateDate: null,
+                // accountAverageAmount: null,
+                // accountOrderCount: null,
+                walletId
+                // walletDisplayed: null,
+                // walletSecured: null,
+                // walletCardInd: null,
+                // ip: null,
+                // mobilePhone: null,
+                // customerId: null,
+                // legalStatus: null,
+                // legalDocument: null,
+                // birthDate: null,
+                // fingerprintID: null,
+                // isBot: null,
+                // isIncognito: null,
+                // isBehindProxy: null,
+                // isFromTor: null,
+                // isEmulator: null,
+                // isRooted: null,
+                // hasTimezoneMismatch: null
+            },
+            owner: {
+                lastName: 'JavaScript',
+                firstName: 'Spottt',
+                billingAddress: {
+                    // street: null,
+                    // cityName: null,
+                    // zipCode: null,
+                    // country: null,
+                    // phone: null
+                }
+                // issueCardDate: null
+            },
+            languageCode: 'eng',
+            securityMode: 'SSL',
+            returnURL: 'https://www.google.com?success',
+            cancelURL: 'https://www.google.com?cancel'
+            // customPaymentPageCode: null,
+            // notificationURL: null,
+            // privateDataList: null,
+            // customPaymentTemplateURL: null,
+            // contractNumberWalletList: null,
+            // merchantName: null
+        };
+        return this.initialize()
+            // .then(client => client.manageWebWalletAsync(requestBody));
+            .then(client => Promise.fromNode(callback => {
+                client.manageWebWallet(requestBody, callback);
+            }))
+            .spread((result, response) => {
+                if (isSuccessful(result.result)) {
+                    return result.redirectURL;
+                }
+
+                throw result;
+            }, parseErrors);
+    }
+
     getWallet(walletId) {
         return this.initialize()
             .then(client => Promise.fromNode(callback => {
