@@ -178,9 +178,9 @@ export default class Payline {
 
 
     // We get SOAP errors if nested objects are not initialized.
-    manageWebWallet(walletId) {
-        const firstName = 'Augustin';
-        const lastName = 'Spottt';
+    createWebWallet({ walletId, firstName, lastName, email, url }) {
+        firstName = firstName || 'N/A';
+        lastName = lastName || 'N/A';
         const contractNumber = this.contractNumber;
 
         const requestBody = {
@@ -189,14 +189,15 @@ export default class Payline {
                 ...defaultBody.buyer,
                 firstName,
                 lastName,
+                email,
                 walletId
             },
             contractNumber,
             selectedContractList: [
                 { selectedContract: contractNumber }
             ],
-            returnURL: 'https://www.google.com/?returnURL',
-            cancelURL: 'https://www.google.com/?cancelURL'
+            returnURL: url,
+            cancelURL: url
         };
         return this.initialize()
             .then(client => Promise.fromNode(callback => {
@@ -207,14 +208,48 @@ export default class Payline {
                     return result.redirectURL;
                 }
 
-                throw result;
+                throw requestBody;
+            }, parseErrors);
+    }
+    // We get SOAP errors if nested objects are not initialized.
+    manageWebWallet({ walletId, firstName, lastName, email, url }) {
+        firstName = firstName || 'N/A';
+        lastName = lastName || 'N/A';
+        const contractNumber = this.contractNumber;
+
+        const requestBody = {
+            ...defaultBody,
+            buyer: {
+                ...defaultBody.buyer,
+                firstName,
+                lastName,
+                email,
+                walletId
+            },
+            contractNumber,
+            selectedContractList: [
+                { selectedContract: contractNumber }
+            ],
+            returnURL: url,
+            cancelURL: url
+        };
+        return this.initialize()
+            .then(client => Promise.fromNode(callback => {
+                client.manageWebWallet(requestBody, callback);
+            }))
+            .spread((result, response) => {
+                if (isSuccessful(result.result)) {
+                    return result.redirectURL;
+                }
+
+                throw requestBody;
             }, parseErrors);
     }
 
-    doImmediateWalletPayment(walletId, amount) {
-        const firstName = 'Augustin';
-        const lastName = 'Spottt';
-        const email = 'augustin@spottt.fr';
+    doImmediateWalletPayment({ walletId, email, firstName, lastName, amount }) {
+        firstName = firstName || 'N/A';
+        lastName = lastName || 'N/A';
+
         const contractNumber = this.contractNumber;
         const ref = walletId;
         const date = formatNow();

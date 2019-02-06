@@ -198,21 +198,24 @@ class Payline {
     }
 
     // We get SOAP errors if nested objects are not initialized.
-    manageWebWallet(walletId) {
-        var firstName = 'Augustin';
-        var lastName = 'Spottt';
+    createWebWallet(_ref2) {
+        var { walletId, firstName, lastName, email, url } = _ref2;
+
+        firstName = firstName || 'N/A';
+        lastName = lastName || 'N/A';
         var contractNumber = this.contractNumber;
 
         var requestBody = _extends({}, defaultBody, {
             buyer: _extends({}, defaultBody.buyer, {
                 firstName,
                 lastName,
+                email,
                 walletId
             }),
             contractNumber,
             selectedContractList: [{ selectedContract: contractNumber }],
-            returnURL: 'https://www.google.com/?returnURL',
-            cancelURL: 'https://www.google.com/?cancelURL'
+            returnURL: url,
+            cancelURL: url
         });
         return this.initialize().then(client => _bluebird2.default.fromNode(callback => {
             client.manageWebWallet(requestBody, callback);
@@ -221,14 +224,46 @@ class Payline {
                 return result.redirectURL;
             }
 
-            throw result;
+            throw requestBody;
+        }, parseErrors);
+    }
+    // We get SOAP errors if nested objects are not initialized.
+    manageWebWallet(_ref3) {
+        var { walletId, firstName, lastName, email, url } = _ref3;
+
+        firstName = firstName || 'N/A';
+        lastName = lastName || 'N/A';
+        var contractNumber = this.contractNumber;
+
+        var requestBody = _extends({}, defaultBody, {
+            buyer: _extends({}, defaultBody.buyer, {
+                firstName,
+                lastName,
+                email,
+                walletId
+            }),
+            contractNumber,
+            selectedContractList: [{ selectedContract: contractNumber }],
+            returnURL: url,
+            cancelURL: url
+        });
+        return this.initialize().then(client => _bluebird2.default.fromNode(callback => {
+            client.manageWebWallet(requestBody, callback);
+        })).spread((result, response) => {
+            if (isSuccessful(result.result)) {
+                return result.redirectURL;
+            }
+
+            throw requestBody;
         }, parseErrors);
     }
 
-    doImmediateWalletPayment(walletId, amount) {
-        var firstName = 'Augustin';
-        var lastName = 'Spottt';
-        var email = 'augustin@spottt.fr';
+    doImmediateWalletPayment(_ref4) {
+        var { walletId, email, firstName, lastName, amount } = _ref4;
+
+        firstName = firstName || 'N/A';
+        lastName = lastName || 'N/A';
+
         var contractNumber = this.contractNumber;
         var ref = walletId;
         var date = formatNow();
@@ -288,8 +323,8 @@ class Payline {
                 contractNumber: this.contractNumber,
                 walletId
             }, callback);
-        })).spread((_ref2, response) => {
-            var { result, wallet = null } = _ref2;
+        })).spread((_ref5, response) => {
+            var { result, wallet = null } = _ref5;
 
             if (isSuccessful(result)) {
                 return wallet;
@@ -322,8 +357,8 @@ class Payline {
         };
         return this.initialize().then(client => _bluebird2.default.fromNode(callback => {
             client.doImmediateWalletPayment(body, callback);
-        })).spread((_ref3) => {
-            var { result, transaction = null } = _ref3;
+        })).spread((_ref6) => {
+            var { result, transaction = null } = _ref6;
 
             if (isSuccessful(result)) {
                 return { transactionId: transaction.id };
@@ -366,8 +401,8 @@ class Payline {
                     cvx: card.cvx
                 }
             }, callback);
-        })).spread((_ref4) => {
-            var { result, transaction = null } = _ref4;
+        })).spread((_ref7) => {
+            var { result, transaction = null } = _ref7;
 
             if (isSuccessful(result)) {
                 return _bluebird2.default.fromNode(callback => client.doReset({
@@ -409,8 +444,8 @@ class Payline {
         };
         return this.initialize().then(client => _bluebird2.default.fromNode(callback => {
             client.doAuthorization(body, callback);
-        })).spread((_ref5) => {
-            var { result, transaction = null } = _ref5;
+        })).spread((_ref8) => {
+            var { result, transaction = null } = _ref8;
 
             if (isSuccessful(result)) {
                 return { transactionId: transaction.id };
@@ -436,8 +471,8 @@ class Payline {
         };
         return this.initialize().then(client => _bluebird2.default.fromNode(callback => {
             client.doCapture(body, callback);
-        })).spread((_ref6) => {
-            var { result, transaction = null } = _ref6;
+        })).spread((_ref9) => {
+            var { result, transaction = null } = _ref9;
 
             if (isSuccessful(result)) {
                 return { transactionId: transaction.id };
