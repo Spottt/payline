@@ -227,6 +227,7 @@ class Payline {
             throw requestBody;
         }, parseErrors);
     }
+
     // We get SOAP errors if nested objects are not initialized.
     manageWebWallet(_ref3) {
         var { walletId, firstName, lastName, email, url } = _ref3;
@@ -482,31 +483,60 @@ class Payline {
         }, parseErrors);
     }
 
-    doWebPayment(amount, ref, date, returnURL, cancelURL) {
-        var currency = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : CURRENCIES.EUR;
+    doWebPayment(_ref10) {
+        var { amount, walletId, firstName, lastName, email, redirectURL, notificationURL } = _ref10;
 
-        var body = {
-            payment: {
-                attributes: ns('payment'),
-                amount,
-                currency,
-                action: ACTIONS.PAYMENT,
-                mode: 'CPT',
-                contractNumber: this.contractNumber
-            },
-            returnURL,
-            cancelURL,
-            order: {
-                attributes: ns('order'),
-                ref,
-                amount,
-                currency,
-                // Format : 20/06/2015 20:21
-                date
-            },
-            selectedContractList: null,
-            buyer: {}
+        firstName = firstName || 'N/A';
+        lastName = lastName || 'N/A';
+        amount = Number.isNaN(Number(amount)) ? 100 : Number(amount);
+
+        var contractNumber = this.contractNumber;
+        var ref = walletId;
+        var date = formatNow();
+        var currency = '978'; // Euros
+        var deliveryMode = '5'; // electronic ticketing
+        var mode = 'CPT';
+        var action = ACTIONS.PAYMENT;
+        var country = 'FR';
+
+        var payment = {
+            attributes: ns('payment'),
+            amount,
+            currency,
+            action,
+            mode,
+            contractNumber
         };
+
+        var order = {
+            attributes: ns('order'),
+            ref,
+            country,
+            amount,
+            currency,
+            date,
+            details: {},
+            deliveryMode
+        };
+
+        var buyer = _extends({}, defaultBody.buyer, {
+            attributes: ns('buyer'),
+            firstName,
+            lastName,
+            email,
+            walletId
+        });
+
+        var body = _extends({}, defaultBody, {
+            payment,
+            order,
+            buyer,
+            selectedContractList: [{ selectedContract: contractNumber }],
+            returnURL: redirectURL,
+            cancelURL: redirectURL,
+            notificationURL,
+            securityMode: 'SSL'
+        });
 
         return this.initialize().then(client => _bluebird2.default.fromNode(callback => {
             client.doWebPayment(body, callback);

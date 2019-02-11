@@ -211,6 +211,7 @@ export default class Payline {
                 throw requestBody;
             }, parseErrors);
     }
+
     // We get SOAP errors if nested objects are not initialized.
     manageWebWallet({ walletId, firstName, lastName, email, url }) {
         firstName = firstName || 'N/A';
@@ -463,28 +464,61 @@ export default class Payline {
             }, parseErrors);
     }
 
-    doWebPayment(amount, ref, date, returnURL, cancelURL, currency = CURRENCIES.EUR) {
-        var body = {
-            payment: {
-                attributes: ns('payment'),
-                amount,
-                currency,
-                action: ACTIONS.PAYMENT,
-                mode: 'CPT',
-                contractNumber: this.contractNumber
-            },
-            returnURL,
-            cancelURL,
-            order: {
-                attributes: ns('order'),
-                ref,
-                amount,
-                currency,
-                // Format : 20/06/2015 20:21
-                date
-            },
-            selectedContractList: null,
-            buyer: {}
+    doWebPayment({ amount, walletId, firstName, lastName, email, redirectURL, notificationURL }) {
+        firstName = firstName || 'N/A';
+        lastName = lastName || 'N/A';
+        amount = Number.isNaN(Number(amount)) ? 100 : Number(amount);
+
+        const contractNumber = this.contractNumber;
+        const ref = walletId;
+        const date = formatNow();
+        const currency = '978'; // Euros
+        const deliveryMode = '5'; // electronic ticketing
+        const mode = 'CPT';
+        const action = ACTIONS.PAYMENT;
+        const country = 'FR';
+
+        const payment = {
+            attributes: ns('payment'),
+            amount,
+            currency,
+            action,
+            mode,
+            contractNumber
+        };
+
+        const order = {
+            attributes: ns('order'),
+            ref,
+            country,
+            amount,
+            currency,
+            date,
+            details: {},
+            deliveryMode
+        };
+
+        const buyer = {
+            ...defaultBody.buyer,
+            attributes: ns('buyer'),
+            firstName,
+            lastName,
+            email,
+            walletId
+        };
+
+        const body = {
+            ...defaultBody,
+            payment,
+            order,
+            buyer,
+            selectedContractList: [
+                { selectedContract: contractNumber }
+            ],
+            returnURL: redirectURL,
+            cancelURL: redirectURL,
+            notificationURL,
+            securityMode: 'SSL'
         };
 
         return this.initialize()
