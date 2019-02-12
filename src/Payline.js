@@ -117,7 +117,7 @@ const defaultBody = {
 
 export default class Payline {
 
-    constructor(user, pass, contractNumber, wsdl = DEFAULT_WSDL) {
+    constructor(user, pass, contractNumber, wsdl = DEFAULT_WSDL, options = {}) {
         if (!user || !pass || !contractNumber) {
             throw new Error('All of user / pass / contractNumber should be defined');
         }
@@ -125,12 +125,13 @@ export default class Payline {
         this.pass = pass;
         this.contractNumber = contractNumber;
         this.wsdl = wsdl;
+        this.options = options;
     }
 
     initialize() {
         if (!this.initializationPromise) {
             this.initializationPromise = Promise.fromNode(callback => {
-                return soap.createClient(this.wsdl, {}, callback);
+                return soap.createClient(this.wsdl, this.options, callback);
             })
             .then(client => {
                 client.setSecurity(new soap.BasicAuthSecurity(this.user, this.pass));
@@ -244,6 +245,27 @@ export default class Payline {
                 }
 
                 throw requestBody;
+            }, parseErrors);
+    }
+
+    getWebPaymentDetails({ token }) {
+        const version = 20;
+
+        const requestBody = {
+            version,
+            token
+        };
+
+        return this.initialize()
+            .then(client => Promise.fromNode(callback => {
+                client.getWebPaymentDetails(requestBody, callback);
+            }))
+            .spread((result, response) => {
+                if (isSuccessful(result.result)) {
+                    return result;
+                }
+
+                throw result;
             }, parseErrors);
     }
 

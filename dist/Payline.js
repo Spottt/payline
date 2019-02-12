@@ -137,6 +137,7 @@ class Payline {
 
     constructor(user, pass, contractNumber) {
         var wsdl = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : DEFAULT_WSDL;
+        var options = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : {};
 
         if (!user || !pass || !contractNumber) {
             throw new Error('All of user / pass / contractNumber should be defined');
@@ -145,12 +146,13 @@ class Payline {
         this.pass = pass;
         this.contractNumber = contractNumber;
         this.wsdl = wsdl;
+        this.options = options;
     }
 
     initialize() {
         if (!this.initializationPromise) {
             this.initializationPromise = _bluebird2.default.fromNode(callback => {
-                return _soap2.default.createClient(this.wsdl, {}, callback);
+                return _soap2.default.createClient(this.wsdl, this.options, callback);
             }).then(client => {
                 client.setSecurity(new _soap2.default.BasicAuthSecurity(this.user, this.pass));
                 client.on('request', xml => {
@@ -259,8 +261,29 @@ class Payline {
         }, parseErrors);
     }
 
-    doImmediateWalletPayment(_ref4) {
-        var { walletId, email, firstName, lastName, amount } = _ref4;
+    getWebPaymentDetails(_ref4) {
+        var { token } = _ref4;
+
+        var version = 20;
+
+        var requestBody = {
+            version,
+            token
+        };
+
+        return this.initialize().then(client => _bluebird2.default.fromNode(callback => {
+            client.getWebPaymentDetails(requestBody, callback);
+        })).spread((result, response) => {
+            if (isSuccessful(result.result)) {
+                return result;
+            }
+
+            throw result;
+        }, parseErrors);
+    }
+
+    doImmediateWalletPayment(_ref5) {
+        var { walletId, email, firstName, lastName, amount } = _ref5;
 
         firstName = firstName || 'N/A';
         lastName = lastName || 'N/A';
@@ -324,8 +347,8 @@ class Payline {
                 contractNumber: this.contractNumber,
                 walletId
             }, callback);
-        })).spread((_ref5, response) => {
-            var { result, wallet = null } = _ref5;
+        })).spread((_ref6, response) => {
+            var { result, wallet = null } = _ref6;
 
             if (isSuccessful(result)) {
                 return wallet;
@@ -358,8 +381,8 @@ class Payline {
         };
         return this.initialize().then(client => _bluebird2.default.fromNode(callback => {
             client.doImmediateWalletPayment(body, callback);
-        })).spread((_ref6) => {
-            var { result, transaction = null } = _ref6;
+        })).spread((_ref7) => {
+            var { result, transaction = null } = _ref7;
 
             if (isSuccessful(result)) {
                 return { transactionId: transaction.id };
@@ -402,8 +425,8 @@ class Payline {
                     cvx: card.cvx
                 }
             }, callback);
-        })).spread((_ref7) => {
-            var { result, transaction = null } = _ref7;
+        })).spread((_ref8) => {
+            var { result, transaction = null } = _ref8;
 
             if (isSuccessful(result)) {
                 return _bluebird2.default.fromNode(callback => client.doReset({
@@ -445,8 +468,8 @@ class Payline {
         };
         return this.initialize().then(client => _bluebird2.default.fromNode(callback => {
             client.doAuthorization(body, callback);
-        })).spread((_ref8) => {
-            var { result, transaction = null } = _ref8;
+        })).spread((_ref9) => {
+            var { result, transaction = null } = _ref9;
 
             if (isSuccessful(result)) {
                 return { transactionId: transaction.id };
@@ -472,8 +495,8 @@ class Payline {
         };
         return this.initialize().then(client => _bluebird2.default.fromNode(callback => {
             client.doCapture(body, callback);
-        })).spread((_ref9) => {
-            var { result, transaction = null } = _ref9;
+        })).spread((_ref10) => {
+            var { result, transaction = null } = _ref10;
 
             if (isSuccessful(result)) {
                 return { transactionId: transaction.id };
@@ -483,8 +506,8 @@ class Payline {
         }, parseErrors);
     }
 
-    doWebPayment(_ref10) {
-        var { amount, walletId, firstName, lastName, email, redirectURL, notificationURL } = _ref10;
+    doWebPayment(_ref11) {
+        var { amount, walletId, firstName, lastName, email, redirectURL, notificationURL } = _ref11;
 
         firstName = firstName || 'N/A';
         lastName = lastName || 'N/A';
