@@ -514,7 +514,8 @@ class Payline {
         amount = Number.isNaN(Number(amount)) ? 100 : Number(amount);
 
         var contractNumber = this.contractNumber;
-        var ref = walletId;
+        var now = new Date().getTime();
+        var ref = `${walletId}-${now}`;
         var date = formatNow();
         var currency = '978'; // Euros
         var deliveryMode = '5'; // electronic ticketing
