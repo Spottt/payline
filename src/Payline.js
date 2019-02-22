@@ -492,7 +492,7 @@ export default class Payline {
         amount = Number.isNaN(Number(amount)) ? 100 : Number(amount);
 
         const contractNumber = this.contractNumber;
-        const ref = walletId;
+        const ref = `${walletId}-${new Date().getTime()}`;
         const date = formatNow();
         const currency = '978'; // Euros
         const deliveryMode = '5'; // electronic ticketing
