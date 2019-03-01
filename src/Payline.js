@@ -498,7 +498,7 @@ export default class Payline {
         const currency = '978'; // Euros
         const deliveryMode = '5'; // electronic ticketing
         const mode = 'CPT';
-        const action = ACTIONS.PAYMENT;
+        const action = ACTIONS.AUTHORIZATION;
         const country = 'FR';
 
         const payment = {
