@@ -520,7 +520,7 @@ class Payline {
         var currency = '978'; // Euros
         var deliveryMode = '5'; // electronic ticketing
         var mode = 'CPT';
-        var action = ACTIONS.PAYMENT;
+        var action = ACTIONS.AUTHORIZATION;
         var country = 'FR';
 
         var payment = {
