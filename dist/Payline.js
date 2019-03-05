@@ -343,14 +343,64 @@ class Payline {
         }, parseErrors);
     }
 
+    doScheduledWalletPayment(_ref6) {
+        var { walletId, amount, differedActionDate, action } = _ref6;
+
+        var contractNumber = this.contractNumber;
+        var ref = walletId;
+        var date = formatNow();
+        var currency = '978'; // Euros
+        var deliveryMode = '5'; // electronic ticketing
+        action = action || 100;
+        var country = 'FR';
+        var scheduledDate = formatDate(differedActionDate).substring(0, 10);
+
+        var payment = {
+            amount,
+            currency,
+            action,
+            contractNumber
+        };
+
+        var order = {
+            ref,
+            country,
+            amount,
+            currency,
+            date,
+            details: {},
+            deliveryMode
+        };
+
+        var requestBody = {
+            version: 20,
+            payment,
+            order,
+            walletId,
+            scheduledDate,
+            privateDataList: {},
+            authentication3DSecure: {},
+            subMerchant: {}
+        };
+        return this.initialize().then(client => _bluebird2.default.fromNode(callback => {
+            client.doScheduledWalletPayment(requestBody, callback);
+        })).spread((result, response) => {
+            if (isSuccessful(result.result)) {
+                return result;
+            }
+
+            throw result;
+        }, parseErrors);
+    }
+
     getWallet(walletId) {
         return this.initialize().then(client => _bluebird2.default.fromNode(callback => {
             client.getWallet({
                 contractNumber: this.contractNumber,
                 walletId
             }, callback);
-        })).spread((_ref6, response) => {
-            var { result, wallet = null } = _ref6;
+        })).spread((_ref7, response) => {
+            var { result, wallet = null } = _ref7;
 
             if (isSuccessful(result)) {
                 return wallet;
@@ -383,8 +433,8 @@ class Payline {
         };
         return this.initialize().then(client => _bluebird2.default.fromNode(callback => {
             client.doImmediateWalletPayment(body, callback);
-        })).spread((_ref7) => {
-            var { result, transaction = null } = _ref7;
+        })).spread((_ref8) => {
+            var { result, transaction = null } = _ref8;
 
             if (isSuccessful(result)) {
                 return { transactionId: transaction.id };
@@ -427,8 +477,8 @@ class Payline {
                     cvx: card.cvx
                 }
             }, callback);
-        })).spread((_ref8) => {
-            var { result, transaction = null } = _ref8;
+        })).spread((_ref9) => {
+            var { result, transaction = null } = _ref9;
 
             if (isSuccessful(result)) {
                 return _bluebird2.default.fromNode(callback => client.doReset({
@@ -470,8 +520,8 @@ class Payline {
         };
         return this.initialize().then(client => _bluebird2.default.fromNode(callback => {
             client.doAuthorization(body, callback);
-        })).spread((_ref9) => {
-            var { result, transaction = null } = _ref9;
+        })).spread((_ref10) => {
+            var { result, transaction = null } = _ref10;
 
             if (isSuccessful(result)) {
                 return { transactionId: transaction.id };
@@ -497,8 +547,8 @@ class Payline {
         };
         return this.initialize().then(client => _bluebird2.default.fromNode(callback => {
             client.doCapture(body, callback);
-        })).spread((_ref10) => {
-            var { result, transaction = null } = _ref10;
+        })).spread((_ref11) => {
+            var { result, transaction = null } = _ref11;
 
             if (isSuccessful(result)) {
                 return { transactionId: transaction.id };
@@ -508,8 +558,8 @@ class Payline {
         }, parseErrors);
     }
 
-    doWebPayment(_ref11) {
-        var { amount, walletId, firstName, lastName, email, redirectURL, notificationURL } = _ref11;
+    doWebPayment(_ref12) {
+        var { amount, walletId, firstName, lastName, email, redirectURL, notificationURL } = _ref12;
 
         firstName = firstName || 'N/A';
         lastName = lastName || 'N/A';

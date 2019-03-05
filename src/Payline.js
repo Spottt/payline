@@ -331,6 +331,56 @@ export default class Payline {
             }, parseErrors);
     }
 
+    doScheduledWalletPayment({ walletId, amount, differedActionDate, action }) {
+        const contractNumber = this.contractNumber;
+        const ref = walletId;
+        const date = formatNow();
+        const currency = '978'; // Euros
+        const deliveryMode = '5'; // electronic ticketing
+        action = action || 100;
+        const country = 'FR';
+        const scheduledDate = formatDate(differedActionDate).substring(0, 10);
+
+        const payment = {
+            amount,
+            currency,
+            action,
+            contractNumber
+        };
+
+        const order = {
+            ref,
+            country,
+            amount,
+            currency,
+            date,
+            details: {},
+            deliveryMode
+        };
+
+        const requestBody = {
+            version: 20,
+            payment,
+            order,
+            walletId,
+            scheduledDate,
+            privateDataList: {},
+            authentication3DSecure: {},
+            subMerchant: {}
+        };
+        return this.initialize()
+            .then(client => Promise.fromNode(callback => {
+                client.doScheduledWalletPayment(requestBody, callback);
+            }))
+            .spread((result, response) => {
+                if (isSuccessful(result.result)) {
+                    return result;
+                }
+
+                throw result;
+            }, parseErrors);
+    }
+
     getWallet(walletId) {
         return this.initialize()
             .then(client => Promise.fromNode(callback => {
