@@ -283,7 +283,7 @@ class Payline {
     }
 
     doImmediateWalletPayment(_ref5) {
-        var { walletId, email, firstName, lastName, amount } = _ref5;
+        var { walletId, email, firstName, lastName, amount, mode, differedActionDate, action } = _ref5;
 
         firstName = firstName || 'N/A';
         lastName = lastName || 'N/A';
@@ -293,15 +293,17 @@ class Payline {
         var date = formatNow();
         var currency = '978'; // Euros
         var deliveryMode = '5'; // electronic ticketing
-        var mode = 'CPT';
-        var action = 100;
+        mode = mode || 'CPT';
+        action = action || 100;
         var country = 'FR';
+        var shortDate = d => formatDate(d).substring(0, 6) + formatDate(d).substring(8, 10);
 
         var payment = {
             amount,
             currency,
             action,
             mode,
+            differedActionDate: mode === 'DIF' ? shortDate(differedActionDate) : null,
             contractNumber
         };
 
@@ -594,13 +596,17 @@ function isSuccessful(result) {
     return result && ['02500', '00000'].indexOf(result.code) !== -1;
 }
 
-function formatNow() {
-    var now = new Date();
-    var year = now.getFullYear().toString();
-    var month = (now.getMonth() + 1).toString(); // getMonth() is zero-based
-    var day = now.getDate().toString();
-    var hour = now.getHours().toString();
-    var minute = now.getMinutes().toString();
+function formatDate(date) {
+    var year = date.getFullYear().toString();
+    var month = (date.getMonth() + 1).toString(); // getMonth() is zero-based
+    var day = date.getDate().toString();
+    var hour = date.getHours().toString();
+    var minute = date.getMinutes().toString();
     // DD/MM/YYYY HH:mm
     return `${day[1] ? day : `0${day[0]}`}/${month[1] ? month : `0${month[0]}`}/${year} ${hour[1] ? hour : `0${hour[0]}`}:${minute[1] ? minute : `0${minute[0]}`}`;
+}
+
+function formatNow() {
+    var now = new Date();
+    return formatDate(now);
 }
