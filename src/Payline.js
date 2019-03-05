@@ -338,12 +338,14 @@ export default class Payline {
         const currency = '978'; // Euros
         const deliveryMode = '5'; // electronic ticketing
         action = action || 100;
+        const mode = 'CPT';
         const country = 'FR';
         const scheduledDate = formatDate(differedActionDate).substring(0, 10);
 
         const payment = {
             amount,
             currency,
+            mode,
             action,
             contractNumber
         };

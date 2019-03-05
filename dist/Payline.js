@@ -352,12 +352,14 @@ class Payline {
         var currency = '978'; // Euros
         var deliveryMode = '5'; // electronic ticketing
         action = action || 100;
+        var mode = 'CPT';
         var country = 'FR';
         var scheduledDate = formatDate(differedActionDate).substring(0, 10);
 
         var payment = {
             amount,
             currency,
+            mode,
             action,
             contractNumber
         };
