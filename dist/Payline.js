@@ -347,7 +347,8 @@ class Payline {
         var { walletId, amount, differedActionDate, action } = _ref6;
 
         var contractNumber = this.contractNumber;
-        var ref = walletId;
+        var now = new Date().getTime();
+        var ref = `${walletId}-${now}`;
         var date = formatNow();
         var currency = '978'; // Euros
         var deliveryMode = '5'; // electronic ticketing
@@ -412,6 +413,20 @@ class Payline {
         }, parseErrors);
     }
 
+    getPaymentRecord(_ref8) {
+        var { paymentRecordId } = _ref8;
+
+        var contractNumber = this.contractNumber;
+        return this.initialize().then(client => _bluebird2.default.fromNode(callback => {
+            client.getPaymentRecord({
+                contractNumber,
+                paymentRecordId
+            }, callback);
+        })).spread((result, response) => {
+            return result;
+        }, parseErrors);
+    }
+
     makeWalletPayment(walletId, amount) {
         var currency = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : CURRENCIES.EUR;
 
@@ -435,8 +450,8 @@ class Payline {
         };
         return this.initialize().then(client => _bluebird2.default.fromNode(callback => {
             client.doImmediateWalletPayment(body, callback);
-        })).spread((_ref8) => {
-            var { result, transaction = null } = _ref8;
+        })).spread((_ref9) => {
+            var { result, transaction = null } = _ref9;
 
             if (isSuccessful(result)) {
                 return { transactionId: transaction.id };
@@ -479,8 +494,8 @@ class Payline {
                     cvx: card.cvx
                 }
             }, callback);
-        })).spread((_ref9) => {
-            var { result, transaction = null } = _ref9;
+        })).spread((_ref10) => {
+            var { result, transaction = null } = _ref10;
 
             if (isSuccessful(result)) {
                 return _bluebird2.default.fromNode(callback => client.doReset({
@@ -522,8 +537,8 @@ class Payline {
         };
         return this.initialize().then(client => _bluebird2.default.fromNode(callback => {
             client.doAuthorization(body, callback);
-        })).spread((_ref10) => {
-            var { result, transaction = null } = _ref10;
+        })).spread((_ref11) => {
+            var { result, transaction = null } = _ref11;
 
             if (isSuccessful(result)) {
                 return { transactionId: transaction.id };
@@ -549,8 +564,8 @@ class Payline {
         };
         return this.initialize().then(client => _bluebird2.default.fromNode(callback => {
             client.doCapture(body, callback);
-        })).spread((_ref11) => {
-            var { result, transaction = null } = _ref11;
+        })).spread((_ref12) => {
+            var { result, transaction = null } = _ref12;
 
             if (isSuccessful(result)) {
                 return { transactionId: transaction.id };
@@ -560,8 +575,8 @@ class Payline {
         }, parseErrors);
     }
 
-    doWebPayment(_ref12) {
-        var { amount, walletId, firstName, lastName, email, redirectURL, notificationURL } = _ref12;
+    doWebPayment(_ref13) {
+        var { amount, walletId, firstName, lastName, email, redirectURL, notificationURL } = _ref13;
 
         firstName = firstName || 'N/A';
         lastName = lastName || 'N/A';
@@ -632,6 +647,7 @@ exports.default = Payline;
 Payline.CURRENCIES = CURRENCIES;
 
 function parseErrors(error) {
+    console.log(error);
     var response = error.response;
     if (response.statusCode === 401) {
         return _bluebird2.default.reject({ shortMessage: 'Wrong API credentials' });

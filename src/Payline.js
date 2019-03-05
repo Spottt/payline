@@ -333,7 +333,8 @@ export default class Payline {
 
     doScheduledWalletPayment({ walletId, amount, differedActionDate, action }) {
         const contractNumber = this.contractNumber;
-        const ref = walletId;
+        const now = (new Date()).getTime();
+        const ref = `${walletId}-${now}`;
         const date = formatNow();
         const currency = '978'; // Euros
         const deliveryMode = '5'; // electronic ticketing
@@ -397,6 +398,20 @@ export default class Payline {
                 }
 
                 throw result;
+            }, parseErrors);
+    }
+
+    getPaymentRecord({ paymentRecordId }) {
+        const contractNumber = this.contractNumber;
+        return this.initialize()
+            .then(client => Promise.fromNode(callback => {
+                client.getPaymentRecord({
+                    contractNumber,
+                    paymentRecordId
+                }, callback);
+            }))
+            .spread((result, response) => {
+                return result;
             }, parseErrors);
     }
 
@@ -615,6 +630,7 @@ export default class Payline {
 Payline.CURRENCIES = CURRENCIES;
 
 function parseErrors(error) {
+    console.log(error);
     const response = error.response;
     if (response.statusCode === 401) {
         return Promise.reject({ shortMessage: 'Wrong API credentials' });
