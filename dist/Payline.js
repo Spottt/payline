@@ -294,7 +294,7 @@ class Payline {
         var currency = '978'; // Euros
         var deliveryMode = '5'; // electronic ticketing
         mode = mode || 'CPT';
-        action = action || 100;
+        action = action || ACTIONS.AUTHORIZATION;
         var country = 'FR';
         var shortDate = d => formatDate(d).substring(0, 6) + formatDate(d).substring(8, 10);
 
@@ -344,7 +344,7 @@ class Payline {
     }
 
     doScheduledWalletPayment(_ref6) {
-        var { walletId, amount, differedActionDate, action } = _ref6;
+        var { walletId, amount, differedActionDate, action, mode } = _ref6;
 
         var contractNumber = this.contractNumber;
         var now = new Date().getTime();
@@ -352,8 +352,8 @@ class Payline {
         var date = formatNow();
         var currency = '978'; // Euros
         var deliveryMode = '5'; // electronic ticketing
-        action = action || 100;
-        var mode = 'CPT';
+        action = action || ACTIONS.AUTHORIZATION;
+        mode = mode || 'CPT';
         var country = 'FR';
         var scheduledDate = formatDate(differedActionDate).substring(0, 10);
 

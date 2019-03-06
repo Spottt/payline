@@ -279,7 +279,7 @@ export default class Payline {
         const currency = '978'; // Euros
         const deliveryMode = '5'; // electronic ticketing
         mode = mode || 'CPT';
-        action = action || 100;
+        action = action || ACTIONS.AUTHORIZATION;
         const country = 'FR';
         const shortDate = (d) => formatDate(d).substring(0, 6) + formatDate(d).substring(8, 10);
 
@@ -331,15 +331,15 @@ export default class Payline {
             }, parseErrors);
     }
 
-    doScheduledWalletPayment({ walletId, amount, differedActionDate, action }) {
+    doScheduledWalletPayment({ walletId, amount, differedActionDate, action, mode }) {
         const contractNumber = this.contractNumber;
         const now = (new Date()).getTime();
         const ref = `${walletId}-${now}`;
         const date = formatNow();
         const currency = '978'; // Euros
         const deliveryMode = '5'; // electronic ticketing
-        action = action || 100;
-        const mode = 'CPT';
+        action = action || ACTIONS.AUTHORIZATION;
+        mode = mode || 'CPT';
         const country = 'FR';
         const scheduledDate = formatDate(differedActionDate).substring(0, 10);
 
