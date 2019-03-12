@@ -347,8 +347,8 @@ class Payline {
         var { walletId, amount, differedActionDate, action, mode } = _ref6;
 
         var contractNumber = this.contractNumber;
-        var now = new Date().getTime();
-        var ref = `${walletId}-${now}`;
+        var pseudorandomstring = randomString(14, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
+        var ref = `${walletId}-${pseudorandomstring}`;
         var date = formatNow();
         var currency = '978'; // Euros
         var deliveryMode = '5'; // electronic ticketing
@@ -677,4 +677,11 @@ function formatDate(date) {
 function formatNow() {
     var now = new Date();
     return formatDate(now);
+}
+
+function randomString(length, chars) {
+    var result = '';
+    for (var i = length; i > 0; --i) {
+        result += chars[Math.round(Math.random() * (chars.length - 1))];
+    }return result;
 }

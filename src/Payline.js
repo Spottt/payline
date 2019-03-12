@@ -333,8 +333,8 @@ export default class Payline {
 
     doScheduledWalletPayment({ walletId, amount, differedActionDate, action, mode }) {
         const contractNumber = this.contractNumber;
-        const now = (new Date()).getTime();
-        const ref = `${walletId}-${now}`;
+        const pseudorandomstring = randomString(14, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
+        const ref = `${walletId}-${pseudorandomstring}`;
         const date = formatNow();
         const currency = '978'; // Euros
         const deliveryMode = '5'; // electronic ticketing
@@ -660,4 +660,11 @@ function formatDate(date) {
 function formatNow() {
     var now = new Date();
     return formatDate(now);
+}
+
+
+function randomString(length, chars) {
+    var result = '';
+    for (var i = length; i > 0; --i) result += chars[Math.round(Math.random() * (chars.length - 1))];
+    return result;
 }
