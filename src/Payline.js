@@ -333,7 +333,7 @@ export default class Payline {
 
     doScheduledWalletPayment({ walletId, amount, differedActionDate, action, mode }) {
         const contractNumber = this.contractNumber;
-        const pseudorandomstring = randomString(14, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
+        const pseudorandomstring = randomString(13, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
         const ref = `${walletId}-${pseudorandomstring}`;
         const date = formatNow();
         const currency = '978'; // Euros
