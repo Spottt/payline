@@ -347,7 +347,7 @@ class Payline {
         var { walletId, amount, differedActionDate, action, mode } = _ref6;
 
         var contractNumber = this.contractNumber;
-        var pseudorandomstring = randomString(14, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
+        var pseudorandomstring = randomString(13, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
         var ref = `${walletId}-${pseudorandomstring}`;
         var date = formatNow();
         var currency = '978'; // Euros
