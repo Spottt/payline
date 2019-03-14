@@ -575,8 +575,47 @@ class Payline {
         }, parseErrors);
     }
 
-    doWebPayment(_ref13) {
-        var { amount, walletId, firstName, lastName, email, redirectURL, notificationURL } = _ref13;
+    doReset(_ref13) {
+        var { transactionID } = _ref13;
+
+        var body = {
+            transactionID
+        };
+        return this.initialize().then(client => _bluebird2.default.fromNode(callback => {
+            client.doReset(body, callback);
+        })).spread((_ref14) => {
+            var { result, transaction = null } = _ref14;
+
+            return result;
+        }, parseErrors);
+    }
+
+    doRefund(_ref15) {
+        var { transactionID, amount, currency = CURRENCIES.EUR } = _ref15;
+
+        var tryAmount = amount;
+        var body = {
+            transactionID,
+            payment: {
+                attributes: ns('payment'),
+                amount: tryAmount,
+                currency,
+                action: ACTIONS.VALIDATION,
+                mode: 'CPT',
+                contractNumber: this.contractNumber
+            }
+        };
+        return this.initialize().then(client => _bluebird2.default.fromNode(callback => {
+            client.doRefund(body, callback);
+        })).spread((_ref16) => {
+            var { result, transaction = null } = _ref16;
+
+            return result;
+        }, parseErrors);
+    }
+
+    doWebPayment(_ref17) {
+        var { amount, walletId, firstName, lastName, email, redirectURL, notificationURL } = _ref17;
 
         firstName = firstName || 'N/A';
         lastName = lastName || 'N/A';
@@ -647,7 +686,6 @@ exports.default = Payline;
 Payline.CURRENCIES = CURRENCIES;
 
 function parseErrors(error) {
-    console.log(error);
     var response = error.response;
     if (response.statusCode === 401) {
         return _bluebird2.default.reject({ shortMessage: 'Wrong API credentials' });

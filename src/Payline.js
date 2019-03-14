@@ -555,6 +555,41 @@ export default class Payline {
             }, parseErrors);
     }
 
+    doReset({ transactionID }) {
+        const body = {
+            transactionID
+        };
+        return this.initialize()
+            .then(client => Promise.fromNode(callback => {
+                client.doReset(body, callback);
+            }))
+            .spread(({ result, transaction = null }) => {
+                return result;
+            }, parseErrors);
+    }
+
+    doRefund({ transactionID, amount, currency = CURRENCIES.EUR }) {
+        const tryAmount = amount;
+        const body = {
+            transactionID,
+            payment: {
+                attributes: ns('payment'),
+                amount: tryAmount,
+                currency,
+                action: ACTIONS.VALIDATION,
+                mode: 'CPT',
+                contractNumber: this.contractNumber
+            }
+        };
+        return this.initialize()
+            .then(client => Promise.fromNode(callback => {
+                client.doRefund(body, callback);
+            }))
+            .spread(({ result, transaction = null }) => {
+                return result;
+            }, parseErrors);
+    }
+
     doWebPayment({ amount, walletId, firstName, lastName, email, redirectURL, notificationURL }) {
         firstName = firstName || 'N/A';
         lastName = lastName || 'N/A';
@@ -630,7 +665,6 @@ export default class Payline {
 Payline.CURRENCIES = CURRENCIES;
 
 function parseErrors(error) {
-    console.log(error);
     const response = error.response;
     if (response.statusCode === 401) {
         return Promise.reject({ shortMessage: 'Wrong API credentials' });
