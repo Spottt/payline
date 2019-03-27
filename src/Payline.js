@@ -415,6 +415,20 @@ export default class Payline {
             }, parseErrors);
     }
 
+    disablePaymentRecord({ paymentRecordId }) {
+        const contractNumber = this.contractNumber;
+        return this.initialize()
+            .then(client => Promise.fromNode(callback => {
+                client.disablePaymentRecord({
+                    contractNumber,
+                    paymentRecordId
+                }, callback);
+            }))
+            .spread((result, response) => {
+                return result;
+            }, parseErrors);
+    }
+
     makeWalletPayment(walletId, amount, currency = CURRENCIES.EUR) {
         const body = {
             payment: {
