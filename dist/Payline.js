@@ -427,6 +427,20 @@ class Payline {
         }, parseErrors);
     }
 
+    disablePaymentRecord(_ref9) {
+        var { paymentRecordId } = _ref9;
+
+        var contractNumber = this.contractNumber;
+        return this.initialize().then(client => _bluebird2.default.fromNode(callback => {
+            client.disablePaymentRecord({
+                contractNumber,
+                paymentRecordId
+            }, callback);
+        })).spread((result, response) => {
+            return result;
+        }, parseErrors);
+    }
+
     makeWalletPayment(walletId, amount) {
         var currency = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : CURRENCIES.EUR;
 
@@ -450,8 +464,8 @@ class Payline {
         };
         return this.initialize().then(client => _bluebird2.default.fromNode(callback => {
             client.doImmediateWalletPayment(body, callback);
-        })).spread((_ref9) => {
-            var { result, transaction = null } = _ref9;
+        })).spread((_ref10) => {
+            var { result, transaction = null } = _ref10;
 
             if (isSuccessful(result)) {
                 return { transactionId: transaction.id };
@@ -494,8 +508,8 @@ class Payline {
                     cvx: card.cvx
                 }
             }, callback);
-        })).spread((_ref10) => {
-            var { result, transaction = null } = _ref10;
+        })).spread((_ref11) => {
+            var { result, transaction = null } = _ref11;
 
             if (isSuccessful(result)) {
                 return _bluebird2.default.fromNode(callback => client.doReset({
@@ -537,8 +551,8 @@ class Payline {
         };
         return this.initialize().then(client => _bluebird2.default.fromNode(callback => {
             client.doAuthorization(body, callback);
-        })).spread((_ref11) => {
-            var { result, transaction = null } = _ref11;
+        })).spread((_ref12) => {
+            var { result, transaction = null } = _ref12;
 
             if (isSuccessful(result)) {
                 return { transactionId: transaction.id };
@@ -564,8 +578,8 @@ class Payline {
         };
         return this.initialize().then(client => _bluebird2.default.fromNode(callback => {
             client.doCapture(body, callback);
-        })).spread((_ref12) => {
-            var { result, transaction = null } = _ref12;
+        })).spread((_ref13) => {
+            var { result, transaction = null } = _ref13;
 
             if (isSuccessful(result)) {
                 return { transactionId: transaction.id };
@@ -575,23 +589,23 @@ class Payline {
         }, parseErrors);
     }
 
-    doReset(_ref13) {
-        var { transactionID } = _ref13;
+    doReset(_ref14) {
+        var { transactionID } = _ref14;
 
         var body = {
             transactionID
         };
         return this.initialize().then(client => _bluebird2.default.fromNode(callback => {
             client.doReset(body, callback);
-        })).spread((_ref14) => {
-            var { result, transaction = null } = _ref14;
+        })).spread((_ref15) => {
+            var { result, transaction = null } = _ref15;
 
             return result;
         }, parseErrors);
     }
 
-    doRefund(_ref15) {
-        var { transactionID, amount, currency = CURRENCIES.EUR } = _ref15;
+    doRefund(_ref16) {
+        var { transactionID, amount, currency = CURRENCIES.EUR } = _ref16;
 
         var tryAmount = amount;
         var body = {
@@ -607,15 +621,15 @@ class Payline {
         };
         return this.initialize().then(client => _bluebird2.default.fromNode(callback => {
             client.doRefund(body, callback);
-        })).spread((_ref16) => {
-            var { result, transaction = null } = _ref16;
+        })).spread((_ref17) => {
+            var { result, transaction = null } = _ref17;
 
             return result;
         }, parseErrors);
     }
 
-    doWebPayment(_ref17) {
-        var { amount, walletId, firstName, lastName, email, redirectURL, notificationURL } = _ref17;
+    doWebPayment(_ref18) {
+        var { amount, walletId, firstName, lastName, email, redirectURL, notificationURL } = _ref18;
 
         firstName = firstName || 'N/A';
         lastName = lastName || 'N/A';
