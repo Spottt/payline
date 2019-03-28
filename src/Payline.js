@@ -392,8 +392,8 @@ export default class Payline {
                     walletId
                 }, callback);
             }))
-            .spread(({ result, wallet = null }, response) => {
-                if (isSuccessful(result)) {
+            .spread((result, response) => {
+                if (isSuccessful(result.result)) {
                     return result;
                 }
 
