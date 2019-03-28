@@ -394,7 +394,7 @@ export default class Payline {
             }))
             .spread(({ result, wallet = null }, response) => {
                 if (isSuccessful(result)) {
-                    return wallet;
+                    return result;
                 }
 
                 throw result;

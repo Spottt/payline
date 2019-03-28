@@ -406,7 +406,7 @@ class Payline {
             var { result, wallet = null } = _ref7;
 
             if (isSuccessful(result)) {
-                return wallet;
+                return result;
             }
 
             throw result;
