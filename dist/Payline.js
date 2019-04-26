@@ -216,7 +216,7 @@ class Payline {
             }),
             contractNumber,
             selectedContractList: [{ selectedContract: contractNumber }],
-            updatePersonalDetails: '1',
+            updatePersonalDetails: '0',
             languageCode: 'fra',
             returnURL: url,
             cancelURL: url
