@@ -205,11 +205,7 @@ export default class Payline {
                 client.manageWebWallet(requestBody, callback);
             }))
             .spread((result, response) => {
-                if (isSuccessful(result.result)) {
-                    return result.redirectURL;
-                }
-
-                throw requestBody;
+                return response;
             }, parseErrors);
     }
 

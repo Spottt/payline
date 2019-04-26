@@ -222,11 +222,7 @@ class Payline {
         return this.initialize().then(client => _bluebird2.default.fromNode(callback => {
             client.manageWebWallet(requestBody, callback);
         })).spread((result, response) => {
-            if (isSuccessful(result.result)) {
-                return result.redirectURL;
-            }
-
-            throw requestBody;
+            return response;
         }, parseErrors);
     }
 
