@@ -205,7 +205,7 @@ export default class Payline {
                 client.manageWebWallet(requestBody, callback);
             }))
             .spread((result, response) => {
-                return response;
+                return result;
             }, parseErrors);
     }
 
