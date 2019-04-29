@@ -179,7 +179,7 @@ export default class Payline {
 
 
     // We get SOAP errors if nested objects are not initialized.
-    createWebWallet({ walletId, firstName, lastName, email, url }) {
+    createWebWallet({ walletId, firstName, lastName, email, url, notificationURL }) {
         firstName = firstName || 'N/A';
         lastName = lastName || 'N/A';
         const contractNumber = this.contractNumber;
@@ -199,6 +199,7 @@ export default class Payline {
             ],
             updatePersonalDetails: '0',
             languageCode: 'fra',
+            notificationURL,
             returnURL: url,
             cancelURL: url
         };

@@ -201,7 +201,7 @@ class Payline {
 
     // We get SOAP errors if nested objects are not initialized.
     createWebWallet(_ref2) {
-        var { walletId, firstName, lastName, email, url } = _ref2;
+        var { walletId, firstName, lastName, email, url, notificationURL } = _ref2;
 
         firstName = firstName || 'N/A';
         lastName = lastName || 'N/A';
@@ -218,6 +218,7 @@ class Payline {
             selectedContractList: [{ selectedContract: contractNumber }],
             updatePersonalDetails: '0',
             languageCode: 'fra',
+            notificationURL,
             returnURL: url,
             cancelURL: url
         });
