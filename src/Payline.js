@@ -590,7 +590,7 @@ export default class Payline {
                 attributes: ns('payment'),
                 amount: tryAmount,
                 currency,
-                action: ACTIONS.VALIDATION,
+                action: 421,
                 mode: 'CPT',
                 contractNumber: this.contractNumber
             }
