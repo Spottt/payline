@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon';
 import soap from 'soap';
 import Promise from 'bluebird';
 import debugLib from 'debug';
@@ -694,14 +695,11 @@ function isSuccessful(result) {
     return result && ['02500', '00000'].indexOf(result.code) !== -1;
 }
 
-function formatDate(date) {
-    var year = date.getFullYear().toString();
-    var month = (date.getMonth() + 1).toString(); // getMonth() is zero-based
-    var day = date.getDate().toString();
-    var hour = date.getHours().toString();
-    var minute = date.getMinutes().toString();
-    // DD/MM/YYYY HH:mm
-    return `${(day[1] ? day : `0${day[0]}`)}/${(month[1] ? month : `0${month[0]}`)}/${year} ${(hour[1] ? hour : `0${hour[0]}`)}:${(minute[1] ? minute : `0${minute[0]}`)}`;
+function formatDate(originalDate) {
+    // converting date to the Paris TZ since Payline does that, apparently.
+    const paylineDate = DateTime.fromJS(originalDate).setZone('Europe/Paris');
+    const formatted = paylineDate.toFormat('dd/LL/yyyy HH:mm');
+    return formatted;
 }
 
 function formatNow() {
