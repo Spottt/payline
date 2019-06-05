@@ -606,12 +606,12 @@ class Payline {
     doRefund(_ref15) {
         var { transactionID, amount, currency = CURRENCIES.EUR } = _ref15;
 
-        var tryAmount = amount;
         var body = {
+            version: 20,
             transactionID,
             payment: {
                 attributes: ns('payment'),
-                amount: tryAmount,
+                amount,
                 currency,
                 action: 421,
                 mode: 'CPT',
@@ -620,9 +620,29 @@ class Payline {
         };
         return this.initialize().then(client => _bluebird2.default.fromNode(callback => {
             client.doRefund(body, callback);
-        })).spread((_ref16) => {
-            var { result, transaction = null } = _ref16;
+        })).spread(result => {
+            return result;
+        }, parseErrors);
+    }
 
+    getTransactionDetails(_ref16) {
+        var { transactionID, orderRef, startDate, endDate } = _ref16;
+
+        var body = {
+            transactionID,
+            orderRef,
+            transactionHistory: 'Y',
+            archiveSearch: true
+        };
+        if (startDate) {
+            body.startDate = startDate;
+        }
+        if (endDate) {
+            body.endDate = endDate;
+        }
+        return this.initialize().then(client => _bluebird2.default.fromNode(callback => {
+            client.getTransactionDetails(body, callback);
+        })).spread(result => {
             return result;
         }, parseErrors);
     }

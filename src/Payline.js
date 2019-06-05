@@ -583,12 +583,12 @@ export default class Payline {
     }
 
     doRefund({ transactionID, amount, currency = CURRENCIES.EUR }) {
-        const tryAmount = amount;
         const body = {
+            version: 20,
             transactionID,
             payment: {
                 attributes: ns('payment'),
-                amount: tryAmount,
+                amount,
                 currency,
                 action: 421,
                 mode: 'CPT',
@@ -599,7 +599,29 @@ export default class Payline {
             .then(client => Promise.fromNode(callback => {
                 client.doRefund(body, callback);
             }))
-            .spread(({ result, transaction = null }) => {
+            .spread((result) => {
+                return result;
+            }, parseErrors);
+    }
+
+    getTransactionDetails({ transactionID, orderRef, startDate, endDate }) {
+        const body = {
+            transactionID,
+            orderRef,
+            transactionHistory: 'Y',
+            archiveSearch: true
+        };
+        if (startDate) {
+            body.startDate = startDate;
+        }
+        if (endDate) {
+            body.endDate = endDate;
+        }
+        return this.initialize()
+            .then(client => Promise.fromNode(callback => {
+                client.getTransactionDetails(body, callback);
+            }))
+            .spread((result) => {
                 return result;
             }, parseErrors);
     }
