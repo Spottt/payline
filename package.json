@@ -23,6 +23,7 @@
   "dependencies": {
     "bluebird": "2.10.x",
     "debug": "2.2.x",
+    "luxon": "^1.21.1",
     "soap": "^0.25.0"
   },
   "devDependencies": {
