@@ -737,7 +737,7 @@ function isSuccessful(result) {
 
 function formatDate(originalDate) {
     // converting date to the Paris TZ since Payline does that, apparently.
-    var paylineDate = _luxon.DateTime.fromJS(originalDate).setZone('Europe/Paris');
+    var paylineDate = _luxon.DateTime.fromJSDate(originalDate).setZone('Europe/Paris');
     var formatted = paylineDate.toFormat('dd/LL/yyyy HH:mm');
     return formatted;
 }
