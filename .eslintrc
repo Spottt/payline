@@ -1,1 +1,72 @@
-{ "extends": ["cubyn"] }
+{
+    "env": {
+        "node": true,
+        "commonjs": true,
+        "amd": true,
+        "browser": true
+    },
+    "overrides": [
+        {
+            "files": ["**/*.test.js"],
+            "env": {
+                "jest": true
+            },
+            "plugins": ["jest"],
+            "rules": {
+                "jest/no-disabled-tests": "warn",
+                "jest/no-focused-tests": "error",
+                "jest/no-identical-title": "error",
+                "jest/prefer-to-have-length": "warn",
+                "jest/valid-expect": "error"
+            }
+        }
+    ],
+    "parserOptions": {
+        "ecmaVersion": 2018,
+        "sourceType": "module"
+    },
+    "globals": {
+        "c3": false,
+        "d3": false,
+        "define": false,
+        "process": false,
+        "__dirname": false,
+        "console": true,
+        "location": false,
+        "pdfjsDistBuildPdf": false,
+        "google": false,
+        "Promise": false,
+        "Mapwize": false,
+        "APP_VERSION_SHA": false,
+        "cy": false,
+        "describe": false,
+        "it": false,
+        "expect": false,
+        "Cypress": false,
+        "Payline": false,
+        "beforeEach": false
+    },
+    "extends": ["eslint:recommended", "prettier", "cubyn"],
+    "plugins": ["prettier"],
+    "rules": {
+        "prettier/prettier": "error",
+        "no-use-before-define": ["error", { "functions": false }],
+        "indent": ["error", 4, { "SwitchCase": 1 }],
+        "linebreak-style": ["error", "unix"],
+        "semi": ["error", "always"],
+        "comma-dangle": ["error", "always-multiline"],
+        "no-console": "off",
+        "quotes": ["error", "double", { "avoidEscape": true }],
+        "no-warning-comments": [
+            "error",
+            {
+                "terms": ["fixme"],
+                "location": "anywhere"
+            }
+        ],
+        "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+        "padded-blocks": ["error", "never"],
+        "curly": ["error", "all"],
+        "eqeqeq": ["error", "always"]
+    }
+}
