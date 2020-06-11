@@ -405,6 +405,7 @@ export default class Payline {
         return this.initialize()
             .then(client => Promise.fromNode(callback => {
                 client.getPaymentRecord({
+                    version: 23,
                     contractNumber,
                     paymentRecordId
                 }, callback);
