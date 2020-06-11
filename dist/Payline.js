@@ -52,7 +52,7 @@ var CURRENCIES = {
 };
 
 var defaultBody = {
-    version: 20,
+    version: 23,
     // contractNumber,
     selectedContractList: [],
     updatePersonalDetails: 0,
@@ -265,7 +265,7 @@ class Payline {
     getWebPaymentDetails(_ref4) {
         var { token } = _ref4;
 
-        var version = 20;
+        var version = 23;
 
         var requestBody = {
             version,
@@ -319,7 +319,7 @@ class Payline {
         };
 
         var requestBody = {
-            version: 20,
+            version: 23,
             payment,
             order,
             buyer: _extends({}, defaultBody.buyer, {
@@ -377,7 +377,7 @@ class Payline {
         };
 
         var requestBody = {
-            version: 20,
+            version: 23,
             payment,
             order,
             walletId,
@@ -607,7 +607,7 @@ class Payline {
         var { transactionID, amount, currency = CURRENCIES.EUR } = _ref15;
 
         var body = {
-            version: 20,
+            version: 23,
             transactionID,
             payment: {
                 attributes: ns('payment'),

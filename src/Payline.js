@@ -31,9 +31,8 @@ const CURRENCIES = {
     GBP: 826
 };
 
-
 const defaultBody = {
-    version: 20,
+    version: 23,
     // contractNumber,
     selectedContractList: [],
     updatePersonalDetails: 0,
@@ -249,7 +248,7 @@ export default class Payline {
     }
 
     getWebPaymentDetails({ token }) {
-        const version = 20;
+        const version = 23;
 
         const requestBody = {
             version,
@@ -303,7 +302,7 @@ export default class Payline {
         };
 
         const requestBody = {
-            version: 20,
+            version: 23,
             payment,
             order,
             buyer: {
@@ -362,7 +361,7 @@ export default class Payline {
         };
 
         const requestBody = {
-            version: 20,
+            version: 23,
             payment,
             order,
             walletId,
@@ -584,7 +583,7 @@ export default class Payline {
 
     doRefund({ transactionID, amount, currency = CURRENCIES.EUR }) {
         const body = {
-            version: 20,
+            version: 23,
             transactionID,
             payment: {
                 attributes: ns('payment'),
