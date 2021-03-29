@@ -32,7 +32,7 @@ const CURRENCIES = {
 };
 
 const defaultBody = {
-    version: 23,
+    version: 27,
     // contractNumber,
     selectedContractList: [],
     updatePersonalDetails: 0,
@@ -248,7 +248,7 @@ export default class Payline {
     }
 
     getWebPaymentDetails({ token }) {
-        const version = 23;
+        const version = 27;
 
         const requestBody = {
             version,
@@ -302,7 +302,7 @@ export default class Payline {
         };
 
         const requestBody = {
-            version: 23,
+            version: 27,
             payment,
             order,
             buyer: {
@@ -361,7 +361,7 @@ export default class Payline {
         };
 
         const requestBody = {
-            version: 23,
+            version: 27,
             payment,
             order,
             walletId,
@@ -405,7 +405,7 @@ export default class Payline {
         return this.initialize()
             .then(client => Promise.fromNode(callback => {
                 client.getPaymentRecord({
-                    version: 23,
+                    version: 27,
                     contractNumber,
                     paymentRecordId
                 }, callback);
@@ -584,7 +584,7 @@ export default class Payline {
 
     doRefund({ transactionID, amount, currency = CURRENCIES.EUR }) {
         const body = {
-            version: 23,
+            version: 27,
             transactionID,
             payment: {
                 attributes: ns('payment'),
