@@ -52,7 +52,7 @@ var CURRENCIES = {
 };
 
 var defaultBody = {
-    version: 23,
+    version: 27,
     // contractNumber,
     selectedContractList: [],
     updatePersonalDetails: 0,
@@ -265,7 +265,7 @@ class Payline {
     getWebPaymentDetails(_ref4) {
         var { token } = _ref4;
 
-        var version = 23;
+        var version = 27;
 
         var requestBody = {
             version,
@@ -319,7 +319,7 @@ class Payline {
         };
 
         var requestBody = {
-            version: 23,
+            version: 27,
             payment,
             order,
             buyer: _extends({}, defaultBody.buyer, {
@@ -377,7 +377,7 @@ class Payline {
         };
 
         var requestBody = {
-            version: 23,
+            version: 27,
             payment,
             order,
             walletId,
@@ -418,6 +418,7 @@ class Payline {
         var contractNumber = this.contractNumber;
         return this.initialize().then(client => _bluebird2.default.fromNode(callback => {
             client.getPaymentRecord({
+                version: 27,
                 contractNumber,
                 paymentRecordId
             }, callback);
@@ -607,7 +608,7 @@ class Payline {
         var { transactionID, amount, currency = CURRENCIES.EUR } = _ref15;
 
         var body = {
-            version: 23,
+            version: 27,
             transactionID,
             payment: {
                 attributes: ns('payment'),
