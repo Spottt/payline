@@ -776,6 +776,33 @@ export default class Payline {
                 throw response.result;
             }, parseErrors);
     }
+
+    transactionsSearchRequest({
+        startDate,
+        endDate,
+        transactionType,
+        contractNumber,
+    }) {
+        const version = 27;
+
+        const requestBody = {
+            version,
+            startDate,
+            endDate,
+            transactionType,
+            contractNumber,
+        };
+
+        return this.initialize()
+            .then((client) =>
+                Promise.fromNode((callback) => {
+                    client.transactionsSearchRequest(requestBody, callback);
+                })
+            )
+            .spread((result) => {
+                return result;
+            }, parseErrors);
+    }
 }
 
 Payline.CURRENCIES = CURRENCIES;
