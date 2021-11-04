@@ -1,17 +1,17 @@
-import { DateTime } from 'luxon';
-import soap from 'soap';
-import Promise from 'bluebird';
-import debugLib from 'debug';
-import path from 'path';
+import { DateTime } from "luxon";
+import soap from "soap";
+import Promise from "bluebird";
+import debugLib from "debug";
+import path from "path";
 
-const debug = debugLib('payline');
+const debug = debugLib("payline");
 
-const DEFAULT_WSDL = path.join(__dirname, 'WebPaymentAPI.v4.44.wsdl');
+const DEFAULT_WSDL = path.join(__dirname, "WebPaymentAPI.v4.44.wsdl");
 const MIN_AMOUNT = 100;
 const ACTIONS = {
     AUTHORIZATION: 100,
     PAYMENT: 101, // validation + payment
-    VALIDATION: 201
+    VALIDATION: 201,
 };
 
 // soap library has trouble loading element types
@@ -20,15 +20,15 @@ function ns(type) {
     return {
         xsi_type: {
             type,
-            xmlns: 'http://obj.ws.payline.experian.com'
-        }
+            xmlns: "http://obj.ws.payline.experian.com",
+        },
     };
 }
 
 const CURRENCIES = {
     EUR: 978,
     USD: 840,
-    GBP: 826
+    GBP: 826,
 };
 
 const defaultBody = {
@@ -42,35 +42,35 @@ const defaultBody = {
         // firstName: null,
         // email: null,
         shippingAddress: {
-        //     title: null,
-        //     name: null,
-        //     firstName: null,
-        //     lastName: null,
-        //     street1: null,
-        //     street2: null,
-        //     cityName: null,
-        //     zipCode: null,
-        //     country: null,
-        //     phone: null,
-        //     state: null,
-        //     county: null,
-        //     phoneType: null
+            //     title: null,
+            //     name: null,
+            //     firstName: null,
+            //     lastName: null,
+            //     street1: null,
+            //     street2: null,
+            //     cityName: null,
+            //     zipCode: null,
+            //     country: null,
+            //     phone: null,
+            //     state: null,
+            //     county: null,
+            //     phoneType: null
         },
         billingAddress: {
-        //     title: null,
-        //     name: null,
-        //     firstName: null,
-        //     lastName: null,
-        //     street1: null,
-        //     street2: null,
-        //     cityName: null,
-        //     zipCode: null,
-        //     country: null,
-        //     phone: null,
-        //     state: null,
-        //     county: null,
-        //     phoneType: null
-        }
+            //     title: null,
+            //     name: null,
+            //     firstName: null,
+            //     lastName: null,
+            //     street1: null,
+            //     street2: null,
+            //     cityName: null,
+            //     zipCode: null,
+            //     country: null,
+            //     phone: null,
+            //     state: null,
+            //     county: null,
+            //     phoneType: null
+        },
         // accountCreateDate: null,
         // accountAverageAmount: null,
         // accountOrderCount: null,
@@ -102,9 +102,9 @@ const defaultBody = {
             // zipCode: null,
             // country: null,
             // phone: null
-        }
+        },
         // issueCardDate: null
-    }
+    },
     // returnURL: null,
     // cancelURL: null,
     // notificationURL: null,
@@ -116,10 +116,11 @@ const defaultBody = {
 };
 
 export default class Payline {
-
     constructor(user, pass, contractNumber, wsdl = DEFAULT_WSDL, options = {}) {
         if (!user || !pass || !contractNumber) {
-            throw new Error('All of user / pass / contractNumber should be defined');
+            throw new Error(
+                "All of user / pass / contractNumber should be defined"
+            );
         }
         this.user = user;
         this.pass = pass;
@@ -130,16 +131,17 @@ export default class Payline {
 
     initialize() {
         if (!this.initializationPromise) {
-            this.initializationPromise = Promise.fromNode(callback => {
+            this.initializationPromise = Promise.fromNode((callback) => {
                 return soap.createClient(this.wsdl, this.options, callback);
-            })
-            .then(client => {
-                client.setSecurity(new soap.BasicAuthSecurity(this.user, this.pass));
-                client.on('request', (xml) => {
-                    debug('REQUEST', xml);
+            }).then((client) => {
+                client.setSecurity(
+                    new soap.BasicAuthSecurity(this.user, this.pass)
+                );
+                client.on("request", (xml) => {
+                    debug("REQUEST", xml);
                 });
-                client.on('response', (xml) => {
-                    debug('RESPONSE', xml);
+                client.on("response", (xml) => {
+                    debug("RESPONSE", xml);
                 });
                 return client;
             });
@@ -151,15 +153,17 @@ export default class Payline {
         const wallet = {
             contractNumber: this.contractNumber,
             wallet: {
-                attributes: ns('wallet'),
+                attributes: ns("wallet"),
                 walletId,
-                card
-            }
+                card,
+            },
         };
         return this.initialize()
-            .then(client => Promise.fromNode(callback => {
-                client.createWallet(wallet, callback);
-            }))
+            .then((client) =>
+                Promise.fromNode((callback) => {
+                    client.createWallet(wallet, callback);
+                })
+            )
             .spread(({ result, response }) => {
                 if (isSuccessful(result)) {
                     return { walletId };
@@ -177,11 +181,17 @@ export default class Payline {
         return this.createOrUpdateWallet.apply(this, [walletId, card, false]);
     }
 
-
     // We get SOAP errors if nested objects are not initialized.
-    createWebWallet({ walletId, firstName, lastName, email, url, notificationURL }) {
-        firstName = firstName || 'N/A';
-        lastName = lastName || 'N/A';
+    createWebWallet({
+        walletId,
+        firstName,
+        lastName,
+        email,
+        url,
+        notificationURL,
+    }) {
+        firstName = firstName || "N/A";
+        lastName = lastName || "N/A";
         const contractNumber = this.contractNumber;
 
         const requestBody = {
@@ -191,22 +201,22 @@ export default class Payline {
                 firstName,
                 lastName,
                 email,
-                walletId
+                walletId,
             },
             contractNumber,
-            selectedContractList: [
-                { selectedContract: contractNumber }
-            ],
-            updatePersonalDetails: '0',
-            languageCode: 'fra',
+            selectedContractList: [{ selectedContract: contractNumber }],
+            updatePersonalDetails: "0",
+            languageCode: "fra",
             notificationURL,
             returnURL: url,
-            cancelURL: url
+            cancelURL: url,
         };
         return this.initialize()
-            .then(client => Promise.fromNode(callback => {
-                client.manageWebWallet(requestBody, callback);
-            }))
+            .then((client) =>
+                Promise.fromNode((callback) => {
+                    client.manageWebWallet(requestBody, callback);
+                })
+            )
             .spread((result, response) => {
                 return result;
             }, parseErrors);
@@ -214,8 +224,8 @@ export default class Payline {
 
     // We get SOAP errors if nested objects are not initialized.
     manageWebWallet({ walletId, firstName, lastName, email, url }) {
-        firstName = firstName || 'N/A';
-        lastName = lastName || 'N/A';
+        firstName = firstName || "N/A";
+        lastName = lastName || "N/A";
         const contractNumber = this.contractNumber;
 
         const requestBody = {
@@ -225,19 +235,19 @@ export default class Payline {
                 firstName,
                 lastName,
                 email,
-                walletId
+                walletId,
             },
             contractNumber,
-            selectedContractList: [
-                { selectedContract: contractNumber }
-            ],
+            selectedContractList: [{ selectedContract: contractNumber }],
             returnURL: url,
-            cancelURL: url
+            cancelURL: url,
         };
         return this.initialize()
-            .then(client => Promise.fromNode(callback => {
-                client.manageWebWallet(requestBody, callback);
-            }))
+            .then((client) =>
+                Promise.fromNode((callback) => {
+                    client.manageWebWallet(requestBody, callback);
+                })
+            )
             .spread((result, response) => {
                 if (isSuccessful(result.result)) {
                     return result.redirectURL;
@@ -252,13 +262,15 @@ export default class Payline {
 
         const requestBody = {
             version,
-            token
+            token,
         };
 
         return this.initialize()
-            .then(client => Promise.fromNode(callback => {
-                client.getWebPaymentDetails(requestBody, callback);
-            }))
+            .then((client) =>
+                Promise.fromNode((callback) => {
+                    client.getWebPaymentDetails(requestBody, callback);
+                })
+            )
             .spread((result, response) => {
                 if (isSuccessful(result.result)) {
                     return result;
@@ -268,27 +280,38 @@ export default class Payline {
             }, parseErrors);
     }
 
-    doImmediateWalletPayment({ walletId, email, firstName, lastName, amount, mode, differedActionDate, action }) {
-        firstName = firstName || 'N/A';
-        lastName = lastName || 'N/A';
+    doImmediateWalletPayment({
+        walletId,
+        email,
+        firstName,
+        lastName,
+        amount,
+        mode,
+        differedActionDate,
+        action,
+    }) {
+        firstName = firstName || "N/A";
+        lastName = lastName || "N/A";
 
         const contractNumber = this.contractNumber;
         const ref = walletId;
         const date = formatNow();
-        const currency = '978'; // Euros
-        const deliveryMode = '5'; // electronic ticketing
-        mode = mode || 'CPT';
+        const currency = "978"; // Euros
+        const deliveryMode = "5"; // electronic ticketing
+        mode = mode || "CPT";
         action = action || ACTIONS.AUTHORIZATION;
-        const country = 'FR';
-        const shortDate = (d) => formatDate(d).substring(0, 6) + formatDate(d).substring(8, 10);
+        const country = "FR";
+        const shortDate = (d) =>
+            formatDate(d).substring(0, 6) + formatDate(d).substring(8, 10);
 
         const payment = {
             amount,
             currency,
             action,
             mode,
-            differedActionDate: mode === 'DIF' ? shortDate(differedActionDate) : null,
-            contractNumber
+            differedActionDate:
+                mode === "DIF" ? shortDate(differedActionDate) : null,
+            contractNumber,
         };
 
         const order = {
@@ -298,7 +321,7 @@ export default class Payline {
             currency,
             date,
             details: {},
-            deliveryMode
+            deliveryMode,
         };
 
         const requestBody = {
@@ -310,17 +333,19 @@ export default class Payline {
                 firstName,
                 lastName,
                 email,
-                walletId
+                walletId,
             },
             walletId,
             privateDataList: {},
             authentication3DSecure: {},
-            subMerchant: {}
+            subMerchant: {},
         };
         return this.initialize()
-            .then(client => Promise.fromNode(callback => {
-                client.doImmediateWalletPayment(requestBody, callback);
-            }))
+            .then((client) =>
+                Promise.fromNode((callback) => {
+                    client.doImmediateWalletPayment(requestBody, callback);
+                })
+            )
             .spread((result, response) => {
                 if (isSuccessful(result.result)) {
                     return result;
@@ -330,16 +355,25 @@ export default class Payline {
             }, parseErrors);
     }
 
-    doScheduledWalletPayment({ walletId, amount, differedActionDate, action, mode }) {
+    doScheduledWalletPayment({
+        walletId,
+        amount,
+        differedActionDate,
+        action,
+        mode,
+    }) {
         const contractNumber = this.contractNumber;
-        const pseudorandomstring = randomString(13, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
+        const pseudorandomstring = randomString(
+            13,
+            "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        );
         const ref = `${walletId}-${pseudorandomstring}`;
         const date = formatNow();
-        const currency = '978'; // Euros
-        const deliveryMode = '5'; // electronic ticketing
+        const currency = "978"; // Euros
+        const deliveryMode = "5"; // electronic ticketing
         action = action || ACTIONS.AUTHORIZATION;
-        mode = mode || 'CPT';
-        const country = 'FR';
+        mode = mode || "CPT";
+        const country = "FR";
         const scheduledDate = formatDate(differedActionDate).substring(0, 10);
 
         const payment = {
@@ -347,7 +381,7 @@ export default class Payline {
             currency,
             mode,
             action,
-            contractNumber
+            contractNumber,
         };
 
         const order = {
@@ -357,7 +391,7 @@ export default class Payline {
             currency,
             date,
             details: {},
-            deliveryMode
+            deliveryMode,
         };
 
         const requestBody = {
@@ -368,12 +402,14 @@ export default class Payline {
             scheduledDate,
             privateDataList: {},
             authentication3DSecure: {},
-            subMerchant: {}
+            subMerchant: {},
         };
         return this.initialize()
-            .then(client => Promise.fromNode(callback => {
-                client.doScheduledWalletPayment(requestBody, callback);
-            }))
+            .then((client) =>
+                Promise.fromNode((callback) => {
+                    client.doScheduledWalletPayment(requestBody, callback);
+                })
+            )
             .spread((result, response) => {
                 if (isSuccessful(result.result)) {
                     return result;
@@ -385,12 +421,17 @@ export default class Payline {
 
     getWallet(walletId) {
         return this.initialize()
-            .then(client => Promise.fromNode(callback => {
-                client.getWallet({
-                    contractNumber: this.contractNumber,
-                    walletId
-                }, callback);
-            }))
+            .then((client) =>
+                Promise.fromNode((callback) => {
+                    client.getWallet(
+                        {
+                            contractNumber: this.contractNumber,
+                            walletId,
+                        },
+                        callback
+                    );
+                })
+            )
             .spread((result, response) => {
                 if (isSuccessful(result.result)) {
                     return result;
@@ -403,13 +444,18 @@ export default class Payline {
     getPaymentRecord({ paymentRecordId }) {
         const contractNumber = this.contractNumber;
         return this.initialize()
-            .then(client => Promise.fromNode(callback => {
-                client.getPaymentRecord({
-                    version: 27,
-                    contractNumber,
-                    paymentRecordId
-                }, callback);
-            }))
+            .then((client) =>
+                Promise.fromNode((callback) => {
+                    client.getPaymentRecord(
+                        {
+                            version: 27,
+                            contractNumber,
+                            paymentRecordId,
+                        },
+                        callback
+                    );
+                })
+            )
             .spread((result, response) => {
                 return result;
             }, parseErrors);
@@ -418,12 +464,17 @@ export default class Payline {
     disablePaymentRecord({ paymentRecordId }) {
         const contractNumber = this.contractNumber;
         return this.initialize()
-            .then(client => Promise.fromNode(callback => {
-                client.disablePaymentRecord({
-                    contractNumber,
-                    paymentRecordId
-                }, callback);
-            }))
+            .then((client) =>
+                Promise.fromNode((callback) => {
+                    client.disablePaymentRecord(
+                        {
+                            contractNumber,
+                            paymentRecordId,
+                        },
+                        callback
+                    );
+                })
+            )
             .spread((result, response) => {
                 return result;
             }, parseErrors);
@@ -432,26 +483,28 @@ export default class Payline {
     makeWalletPayment(walletId, amount, currency = CURRENCIES.EUR) {
         const body = {
             payment: {
-                attributes: ns('payment'),
+                attributes: ns("payment"),
                 amount,
                 currency,
                 action: ACTIONS.PAYMENT,
-                mode: 'CPT',
-                contractNumber: this.contractNumber
+                mode: "CPT",
+                contractNumber: this.contractNumber,
             },
             order: {
-                attributes: ns('order'),
+                attributes: ns("order"),
                 ref: `order_${generateId()}`,
                 amount,
                 currency,
-                date: formatNow()
+                date: formatNow(),
             },
-            walletId
+            walletId,
         };
         return this.initialize()
-            .then(client => Promise.fromNode(callback => {
-                client.doImmediateWalletPayment(body, callback);
-            }))
+            .then((client) =>
+                Promise.fromNode((callback) => {
+                    client.doImmediateWalletPayment(body, callback);
+                })
+            )
             .spread(({ result, transaction = null }) => {
                 if (isSuccessful(result)) {
                     return { transactionId: transaction.id };
@@ -466,40 +519,49 @@ export default class Payline {
         tryAmount = Math.max(tryAmount, MIN_AMOUNT);
         var client;
         return this.initialize()
-            .then((c) => Promise.fromNode(callback => {
-                client = c;
-                client.doAuthorization({
-                    payment: {
-                        attributes: ns('payment'),
-                        amount: tryAmount,
-                        currency,
-                        action: ACTIONS.AUTHORIZATION,
-                        mode: 'CPT',
-                        contractNumber: this.contractNumber
-                    },
-                    order: {
-                        attributes: ns('order'),
-                        ref: `order_${generateId()}`,
-                        amount: tryAmount,
-                        currency,
-                        date: formatNow()
-                    },
-                    card: {
-                        attributes: ns('card'),
-                        number: card.number,
-                        type: card.type,
-                        expirationDate: card.expirationDate,
-                        cvx: card.cvx
-                    }
-                }, callback);
-            }))
+            .then((c) =>
+                Promise.fromNode((callback) => {
+                    client = c;
+                    client.doAuthorization(
+                        {
+                            payment: {
+                                attributes: ns("payment"),
+                                amount: tryAmount,
+                                currency,
+                                action: ACTIONS.AUTHORIZATION,
+                                mode: "CPT",
+                                contractNumber: this.contractNumber,
+                            },
+                            order: {
+                                attributes: ns("order"),
+                                ref: `order_${generateId()}`,
+                                amount: tryAmount,
+                                currency,
+                                date: formatNow(),
+                            },
+                            card: {
+                                attributes: ns("card"),
+                                number: card.number,
+                                type: card.type,
+                                expirationDate: card.expirationDate,
+                                cvx: card.cvx,
+                            },
+                        },
+                        callback
+                    );
+                })
+            )
             .spread(({ result, transaction = null }) => {
                 if (isSuccessful(result)) {
-                    return Promise.fromNode(callback => client.doReset({
-                        transactionID: transaction.id,
-                        comment: 'Card validation cleanup'
-                    }, callback))
-                    .return(true);
+                    return Promise.fromNode((callback) =>
+                        client.doReset(
+                            {
+                                transactionID: transaction.id,
+                                comment: "Card validation cleanup",
+                            },
+                            callback
+                        )
+                    ).return(true);
                 }
 
                 return false;
@@ -509,57 +571,61 @@ export default class Payline {
     doAuthorization(reference, card, tryAmount, currency = CURRENCIES.EUR) {
         const body = {
             payment: {
-                attributes: ns('payment'),
+                attributes: ns("payment"),
                 amount: tryAmount,
                 currency,
                 action: ACTIONS.AUTHORIZATION,
-                mode: 'CPT',
-                contractNumber: this.contractNumber
+                mode: "CPT",
+                contractNumber: this.contractNumber,
             },
             order: {
-                attributes: ns('order'),
+                attributes: ns("order"),
                 ref: reference,
                 amount: tryAmount,
                 currency,
-                date: formatNow()
+                date: formatNow(),
             },
             card: {
-                attributes: ns('card'),
+                attributes: ns("card"),
                 number: card.number,
                 type: card.type,
                 expirationDate: card.expirationDate,
-                cvx: card.cvx
-            }
+                cvx: card.cvx,
+            },
         };
         return this.initialize()
-                .then(client => Promise.fromNode(callback => {
+            .then((client) =>
+                Promise.fromNode((callback) => {
                     client.doAuthorization(body, callback);
-                }))
-                .spread(({ result, transaction = null }) => {
-                    if (isSuccessful(result)) {
-                        return { transactionId: transaction.id };
-                    }
+                })
+            )
+            .spread(({ result, transaction = null }) => {
+                if (isSuccessful(result)) {
+                    return { transactionId: transaction.id };
+                }
 
-                    throw result;
-                }, parseErrors);
+                throw result;
+            }, parseErrors);
     }
 
     doCapture(transactionID, tryAmount, currency = CURRENCIES.EUR) {
         const body = {
             payment: {
-                attributes: ns('payment'),
+                attributes: ns("payment"),
                 amount: tryAmount,
                 currency,
                 action: ACTIONS.VALIDATION,
-                mode: 'CPT',
-                contractNumber: this.contractNumber
+                mode: "CPT",
+                contractNumber: this.contractNumber,
             },
-            transactionID
+            transactionID,
         };
         return this.initialize()
-            .then(client => Promise.fromNode(callback => {
-                client.doCapture(body, callback);
-            }))
+            .then((client) =>
+                Promise.fromNode((callback) => {
+                    client.doCapture(body, callback);
+                })
+            )
             .spread(({ result, transaction = null }) => {
                 if (isSuccessful(result)) {
                     return { transactionId: transaction.id };
@@ -571,12 +637,14 @@ export default class Payline {
 
     doReset({ transactionID }) {
         const body = {
-            transactionID
+            transactionID,
         };
         return this.initialize()
-            .then(client => Promise.fromNode(callback => {
-                client.doReset(body, callback);
-            }))
+            .then((client) =>
+                Promise.fromNode((callback) => {
+                    client.doReset(body, callback);
+                })
+            )
             .spread(({ result, transaction = null }) => {
                 return result;
             }, parseErrors);
@@ -587,18 +655,20 @@ export default class Payline {
             version: 27,
             transactionID,
             payment: {
-                attributes: ns('payment'),
+                attributes: ns("payment"),
                 amount,
                 currency,
                 action: 421,
-                mode: 'CPT',
-                contractNumber: this.contractNumber
-            }
+                mode: "CPT",
+                contractNumber: this.contractNumber,
+            },
         };
         return this.initialize()
-            .then(client => Promise.fromNode(callback => {
-                client.doRefund(body, callback);
-            }))
+            .then((client) =>
+                Promise.fromNode((callback) => {
+                    client.doRefund(body, callback);
+                })
+            )
             .spread((result) => {
                 return result;
             }, parseErrors);
@@ -608,8 +678,8 @@ export default class Payline {
         const body = {
             transactionID,
             orderRef,
-            transactionHistory: 'Y',
-            archiveSearch: true
+            transactionHistory: "Y",
+            archiveSearch: true,
         };
         if (startDate) {
             body.startDate = startDate;
@@ -618,56 +688,66 @@ export default class Payline {
             body.endDate = endDate;
         }
         return this.initialize()
-            .then(client => Promise.fromNode(callback => {
-                client.getTransactionDetails(body, callback);
-            }))
+            .then((client) =>
+                Promise.fromNode((callback) => {
+                    client.getTransactionDetails(body, callback);
+                })
+            )
             .spread((result) => {
                 return result;
             }, parseErrors);
     }
 
-    doWebPayment({ amount, walletId, firstName, lastName, email, redirectURL, notificationURL }) {
-        firstName = firstName || 'N/A';
-        lastName = lastName || 'N/A';
+    doWebPayment({
+        amount,
+        walletId,
+        firstName,
+        lastName,
+        email,
+        redirectURL,
+        notificationURL,
+    }) {
+        firstName = firstName || "N/A";
+        lastName = lastName || "N/A";
         amount = Number.isNaN(Number(amount)) ? 100 : Number(amount);
 
         const contractNumber = this.contractNumber;
-        const now = (new Date()).getTime();
+        const now = new Date().getTime();
         const ref = `${walletId}-${now}`;
         const date = formatNow();
-        const currency = '978'; // Euros
-        const deliveryMode = '5'; // electronic ticketing
-        const mode = 'CPT';
+        const currency = "978"; // Euros
+        const deliveryMode = "5"; // electronic ticketing
+        const mode = "CPT";
         const action = ACTIONS.AUTHORIZATION;
-        const country = 'FR';
+        const country = "FR";
 
         const payment = {
-            attributes: ns('payment'),
+            attributes: ns("payment"),
             amount,
             currency,
             action,
             mode,
-            contractNumber
+            contractNumber,
         };
 
         const order = {
-            attributes: ns('order'),
+            attributes: ns("order"),
             ref,
             country,
             amount,
             currency,
             date,
             details: {},
-            deliveryMode
+            deliveryMode,
         };
 
         const buyer = {
             ...defaultBody.buyer,
-            attributes: ns('buyer'),
+            attributes: ns("buyer"),
             firstName,
             lastName,
             email,
-            walletId
+            walletId,
         };
 
         const body = {
@@ -675,20 +755,20 @@ export default class Payline {
             payment,
             order,
             buyer,
-            selectedContractList: [
-                { selectedContract: contractNumber }
-            ],
+            selectedContractList: [{ selectedContract: contractNumber }],
             returnURL: redirectURL,
             cancelURL: redirectURL,
             notificationURL,
-            securityMode: 'SSL'
+            securityMode: "SSL",
         };
 
         return this.initialize()
-            .then(client => Promise.fromNode(callback => {
-                client.doWebPayment(body, callback);
-            }))
-            .spread(response => {
+            .then((client) =>
+                Promise.fromNode((callback) => {
+                    client.doWebPayment(body, callback);
+                })
+            )
+            .spread((response) => {
                 if (isSuccessful(response.result)) {
                     return response;
                 }
@@ -703,10 +783,10 @@ Payline.CURRENCIES = CURRENCIES;
 function parseErrors(error) {
     const response = error.response;
     if (response.statusCode === 401) {
-        return Promise.reject({ shortMessage: 'Wrong API credentials' });
+        return Promise.reject({ shortMessage: "Wrong API credentials" });
     }
 
-    return Promise.reject({ shortMessage: 'Wrong API call' });
+    return Promise.reject({ shortMessage: "Wrong API call" });
 }
 
 function generateId() {
@@ -714,13 +794,14 @@ function generateId() {
 }
 
 function isSuccessful(result) {
-    return result && ['02500', '00000'].indexOf(result.code) !== -1;
+    return result && ["02500", "00000"].indexOf(result.code) !== -1;
 }
 
 function formatDate(originalDate) {
     // converting date to the Paris TZ since Payline does that, apparently.
-    const paylineDate = DateTime.fromJSDate(originalDate).setZone('Europe/Paris');
-    const formatted = paylineDate.toFormat('dd/LL/yyyy HH:mm');
+    const paylineDate =
+        DateTime.fromJSDate(originalDate).setZone("Europe/Paris");
+    const formatted = paylineDate.toFormat("dd/LL/yyyy HH:mm");
     return formatted;
 }
 
@@ -729,9 +810,9 @@ function formatNow() {
     return formatDate(now);
 }
 
-
 function randomString(length, chars) {
-    var result = '';
-    for (var i = length; i > 0; --i) result += chars[Math.round(Math.random() * (chars.length - 1))];
+    var result = "";
+    for (var i = length; i > 0; --i)
+        result += chars[Math.round(Math.random() * (chars.length - 1))];
     return result;
 }
