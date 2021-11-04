@@ -777,7 +777,7 @@ export default class Payline {
             }, parseErrors);
     }
 
-    transactionsSearchRequest({
+    transactionsSearch({
         startDate,
         endDate,
         transactionType,
@@ -796,7 +796,7 @@ export default class Payline {
         return this.initialize()
             .then((client) =>
                 Promise.fromNode((callback) => {
-                    client.transactionsSearchRequest(requestBody, callback);
+                    client.transactionsSearch(requestBody, callback);
                 })
             )
             .spread((result) => {

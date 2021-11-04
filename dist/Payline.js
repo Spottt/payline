@@ -744,7 +744,7 @@ class Payline {
         }, parseErrors);
     }
 
-    transactionsSearchRequest(_ref18) {
+    transactionsSearch(_ref18) {
         var {
             startDate,
             endDate,
@@ -763,7 +763,7 @@ class Payline {
         };
 
         return this.initialize().then(client => _bluebird2.default.fromNode(callback => {
-            client.transactionsSearchRequest(requestBody, callback);
+            client.transactionsSearch(requestBody, callback);
         })).spread(result => {
             return result;
         }, parseErrors);
