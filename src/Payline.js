@@ -782,6 +782,7 @@ export default class Payline {
         endDate,
         transactionType,
         contractNumber,
+        returnCode,
     }) {
         const version = 27;
 
@@ -791,6 +792,7 @@ export default class Payline {
             endDate,
             transactionType,
             contractNumber,
+            returnCode,
         };
 
         return this.initialize()
