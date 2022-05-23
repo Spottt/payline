@@ -204,22 +204,56 @@ class Payline {
     createWebWallet(_ref2) {
         var {
             walletId,
-            firstName,
             lastName,
+            firstName,
+            phone,
             email,
+            createdAt,
+            address,
+            city,
+            postalCode,
+            country,
             url,
             notificationURL
         } = _ref2;
 
-        firstName = firstName || "N/A";
-        lastName = lastName || "N/A";
+        var orderCreationDateFormatted = formatDate(new Date(createdAt));
+        var buyer = {
+            lastName,
+            firstName,
+            mobilePhone: phone,
+            email,
+            shippingAdress: {
+                addressCreateDate: orderCreationDateFormatted,
+                firstName,
+                lastName,
+                street1: address,
+                cityName: city,
+                zipCode: postalCode,
+                country,
+                email
+            },
+            billingAddress: {
+                street1: address,
+                cityName: city,
+                zipCode: postalCode,
+                country,
+                phone
+            },
+            merchantAuthentication: { method: '02', date: formatNow() },
+            accountCreateDate: orderCreationDateFormatted,
+            buyerExtended: {
+                buyerExtendedHistory: {
+                    suspiciousActivity: '01',
+                    provisionAttemptsDay: 0,
+                    transactionCountDay: 0
+                }
+            }
+        };
         var contractNumber = this.contractNumber;
 
         var requestBody = _extends({}, defaultBody, {
-            buyer: _extends({}, defaultBody.buyer, {
-                firstName,
-                lastName,
-                email,
+            buyer: _extends({}, defaultBody.buyer, buyer, {
                 walletId
             }),
             contractNumber,
@@ -749,7 +783,8 @@ class Payline {
             startDate,
             endDate,
             transactionType,
-            contractNumber
+            contractNumber,
+            returnCode
         } = _ref18;
 
         var version = 27;
@@ -759,7 +794,8 @@ class Payline {
             startDate,
             endDate,
             transactionType,
-            contractNumber
+            contractNumber,
+            returnCode
         };
 
         return this.initialize().then(client => _bluebird2.default.fromNode(callback => {

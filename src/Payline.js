@@ -184,24 +184,59 @@ export default class Payline {
     // We get SOAP errors if nested objects are not initialized.
     createWebWallet({
         walletId,
-        firstName,
         lastName,
+        firstName,
+        phone,
         email,
+        createdAt,
+        address,
+        city,
+        postalCode,
+        country,
         url,
-        notificationURL,
+        notificationURL
     }) {
-        firstName = firstName || "N/A";
-        lastName = lastName || "N/A";
+        const orderCreationDateFormatted = formatDate(new Date(createdAt));
+        const buyer = {
+            lastName,
+            firstName,
+            mobilePhone: phone,
+            email,
+            shippingAdress: {
+                addressCreateDate: orderCreationDateFormatted,
+                firstName,
+                lastName,
+                street1: address,
+                cityName: city,
+                zipCode: postalCode,
+                country,
+                email
+            },
+            billingAddress: {
+                street1: address,
+                cityName: city,
+                zipCode: postalCode,
+                country,
+                phone
+            },
+            merchantAuthentication: { method: '02', date: formatNow() },
+            accountCreateDate: orderCreationDateFormatted,
+            buyerExtended: {
+                buyerExtendedHistory: {
+                    suspiciousActivity: '01',
+                    provisionAttemptsDay: 0,
+                    transactionCountDay: 0
+                }
+            }
+        };
         const contractNumber = this.contractNumber;
 
         const requestBody = {
             ...defaultBody,
             buyer: {
                 ...defaultBody.buyer,
-                firstName,
-                lastName,
-                email,
-                walletId,
+                ...buyer,
+                walletId
             },
             contractNumber,
             selectedContractList: [{ selectedContract: contractNumber }],
@@ -209,7 +244,7 @@ export default class Payline {
             languageCode: "fra",
             notificationURL,
             returnURL: url,
-            cancelURL: url,
+            cancelURL: url
         };
         return this.initialize()
             .then((client) =>
