@@ -196,7 +196,7 @@ export default class Payline {
         url,
         notificationURL
     }) {
-        const orderCreationDateFormatted = formatDate(new Date(createdAt));
+        const orderCreationDateFormatted = formatShortDate(new Date(createdAt));
         const buyer = {
             lastName,
             firstName,
@@ -337,7 +337,7 @@ export default class Payline {
         action = action || ACTIONS.AUTHORIZATION;
         const country = "FR";
         const shortDate = (d) =>
-            formatDate(d).substring(0, 6) + formatDate(d).substring(8, 10);
+            formatDateWithTime(d).substring(0, 6) + formatDateWithTime(d).substring(8, 10);
 
         const payment = {
             amount,
@@ -409,7 +409,7 @@ export default class Payline {
         action = action || ACTIONS.AUTHORIZATION;
         mode = mode || "CPT";
         const country = "FR";
-        const scheduledDate = formatDate(differedActionDate).substring(0, 10);
+        const scheduledDate = formatDateWithTime(differedActionDate).substring(0, 10);
 
         const payment = {
             amount,
@@ -861,17 +861,23 @@ function isSuccessful(result) {
     return result && ["02500", "00000"].indexOf(result.code) !== -1;
 }
 
-function formatDate(originalDate) {
+function formatDateWithTime(originalDate) {
     // converting date to the Paris TZ since Payline does that, apparently.
     const paylineDate =
         DateTime.fromJSDate(originalDate).setZone("Europe/Paris");
-    const formatted = paylineDate.toFormat("dd/LL/yyyy HH:mm");
-    return formatted;
+    return paylineDate.toFormat("dd/LL/yyyy HH:mm");
+}
+
+function formatShortDate(originalDate) {
+    // converting date to the Paris TZ since Payline does that, apparently.
+    const paylineDate =
+        DateTime.fromJSDate(originalDate).setZone("Europe/Paris");
+    return paylineDate.toFormat("dd/LL/yy");
 }
 
 function formatNow() {
     var now = new Date();
-    return formatDate(now);
+    return formatDateWithTime(now);
 }
 
 function randomString(length, chars) {

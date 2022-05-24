@@ -217,7 +217,7 @@ class Payline {
             notificationURL
         } = _ref2;
 
-        var orderCreationDateFormatted = formatDate(new Date(createdAt));
+        var orderCreationDateFormatted = formatShortDate(new Date(createdAt));
         var buyer = {
             lastName,
             firstName,
@@ -346,7 +346,7 @@ class Payline {
         mode = mode || "CPT";
         action = action || ACTIONS.AUTHORIZATION;
         var country = "FR";
-        var shortDate = d => formatDate(d).substring(0, 6) + formatDate(d).substring(8, 10);
+        var shortDate = d => formatDateWithTime(d).substring(0, 6) + formatDateWithTime(d).substring(8, 10);
 
         var payment = {
             amount,
@@ -411,7 +411,7 @@ class Payline {
         action = action || ACTIONS.AUTHORIZATION;
         mode = mode || "CPT";
         var country = "FR";
-        var scheduledDate = formatDate(differedActionDate).substring(0, 10);
+        var scheduledDate = formatDateWithTime(differedActionDate).substring(0, 10);
 
         var payment = {
             amount,
@@ -826,16 +826,21 @@ function isSuccessful(result) {
     return result && ["02500", "00000"].indexOf(result.code) !== -1;
 }
 
-function formatDate(originalDate) {
+function formatDateWithTime(originalDate) {
     // converting date to the Paris TZ since Payline does that, apparently.
     var paylineDate = _luxon.DateTime.fromJSDate(originalDate).setZone("Europe/Paris");
-    var formatted = paylineDate.toFormat("dd/LL/yyyy HH:mm");
-    return formatted;
+    return paylineDate.toFormat("dd/LL/yyyy HH:mm");
+}
+
+function formatShortDate(originalDate) {
+    // converting date to the Paris TZ since Payline does that, apparently.
+    var paylineDate = _luxon.DateTime.fromJSDate(originalDate).setZone("Europe/Paris");
+    return paylineDate.toFormat("dd/LL/yy");
 }
 
 function formatNow() {
     var now = new Date();
-    return formatDate(now);
+    return formatDateWithTime(now);
 }
 
 function randomString(length, chars) {
