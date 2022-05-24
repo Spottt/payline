@@ -196,6 +196,7 @@ export default class Payline {
         url,
         notificationURL
     }) {
+        createdAt = createdAt || new Date().getTime();
         const orderCreationDateFormatted = formatShortDate(new Date(createdAt));
         const buyer = {
             lastName,

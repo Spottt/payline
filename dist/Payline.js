@@ -217,6 +217,7 @@ class Payline {
             notificationURL
         } = _ref2;
 
+        createdAt = createdAt || new Date().getTime();
         var orderCreationDateFormatted = formatShortDate(new Date(createdAt));
         var buyer = {
             lastName,
