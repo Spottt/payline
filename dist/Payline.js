@@ -206,7 +206,6 @@ class Payline {
             walletId,
             lastName,
             firstName,
-            phone,
             email,
             createdAt,
             address,
@@ -222,7 +221,6 @@ class Payline {
         var buyer = {
             lastName,
             firstName,
-            mobilePhone: phone,
             email,
             shippingAdress: {
                 addressCreateDate: orderCreationDateFormatted,
@@ -238,8 +236,7 @@ class Payline {
                 street1: address,
                 cityName: city,
                 zipCode: postalCode,
-                country,
-                phone
+                country
             },
             merchantAuthentication: { method: '02', date: formatNow() },
             accountCreateDate: orderCreationDateFormatted,

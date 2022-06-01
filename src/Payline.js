@@ -186,7 +186,6 @@ export default class Payline {
         walletId,
         lastName,
         firstName,
-        phone,
         email,
         createdAt,
         address,
@@ -201,7 +200,6 @@ export default class Payline {
         const buyer = {
             lastName,
             firstName,
-            mobilePhone: phone,
             email,
             shippingAdress: {
                 addressCreateDate: orderCreationDateFormatted,
@@ -218,7 +216,6 @@ export default class Payline {
                 cityName: city,
                 zipCode: postalCode,
                 country,
-                phone
             },
             merchantAuthentication: { method: '02', date: formatNow() },
             accountCreateDate: orderCreationDateFormatted,
