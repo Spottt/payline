@@ -1,17 +1,17 @@
-import { DateTime } from "luxon";
-import soap from "soap";
-import Promise from "bluebird";
-import debugLib from "debug";
-import path from "path";
+import { DateTime } from 'luxon';
+import soap from 'soap';
+import Promise from 'bluebird';
+import debugLib from 'debug';
+import path from 'path';
 
-const debug = debugLib("payline");
+const debug = debugLib('payline');
 
-const DEFAULT_WSDL = path.join(__dirname, "WebPaymentAPI.v4.44.wsdl");
+const DEFAULT_WSDL = path.join(__dirname, 'WebPaymentAPI.v4.44.wsdl');
 const MIN_AMOUNT = 100;
 const ACTIONS = {
     AUTHORIZATION: 100,
     PAYMENT: 101, // validation + payment
-    VALIDATION: 201,
+    VALIDATION: 201
 };
 
 // soap library has trouble loading element types
@@ -20,15 +20,15 @@ function ns(type) {
     return {
         xsi_type: {
             type,
-            xmlns: "http://obj.ws.payline.experian.com",
-        },
+            xmlns: 'http://obj.ws.payline.experian.com'
+        }
     };
 }
 
 const CURRENCIES = {
     EUR: 978,
     USD: 840,
-    GBP: 826,
+    GBP: 826
 };
 
 const defaultBody = {
@@ -70,7 +70,7 @@ const defaultBody = {
             //     state: null,
             //     county: null,
             //     phoneType: null
-        },
+        }
         // accountCreateDate: null,
         // accountAverageAmount: null,
         // accountOrderCount: null,
@@ -102,9 +102,9 @@ const defaultBody = {
             // zipCode: null,
             // country: null,
             // phone: null
-        },
+        }
         // issueCardDate: null
-    },
+    }
     // returnURL: null,
     // cancelURL: null,
     // notificationURL: null,
@@ -119,7 +119,7 @@ export default class Payline {
     constructor(user, pass, contractNumber, wsdl = DEFAULT_WSDL, options = {}) {
         if (!user || !pass || !contractNumber) {
             throw new Error(
-                "All of user / pass / contractNumber should be defined"
+                'All of user / pass / contractNumber should be defined'
             );
         }
         this.user = user;
@@ -137,11 +137,11 @@ export default class Payline {
                 client.setSecurity(
                     new soap.BasicAuthSecurity(this.user, this.pass)
                 );
-                client.on("request", (xml) => {
-                    debug("REQUEST", xml);
+                client.on('request', (xml) => {
+                    debug('REQUEST', xml);
                 });
-                client.on("response", (xml) => {
-                    debug("RESPONSE", xml);
+                client.on('response', (xml) => {
+                    debug('RESPONSE', xml);
                 });
                 return client;
             });
@@ -153,10 +153,10 @@ export default class Payline {
         const wallet = {
             contractNumber: this.contractNumber,
             wallet: {
-                attributes: ns("wallet"),
+                attributes: ns('wallet'),
                 walletId,
-                card,
-            },
+                card
+            }
         };
         return this.initialize()
             .then((client) =>
@@ -215,7 +215,7 @@ export default class Payline {
                 street1: address,
                 cityName: city,
                 zipCode: postalCode,
-                country,
+                country
             },
             merchantAuthentication: { method: '02', date: formatNow() },
             accountCreateDate: orderCreationDateFormatted,
@@ -238,8 +238,8 @@ export default class Payline {
             },
             contractNumber,
             selectedContractList: [{ selectedContract: contractNumber }],
-            updatePersonalDetails: "0",
-            languageCode: "fra",
+            updatePersonalDetails: '0',
+            languageCode: 'fra',
             notificationURL,
             returnURL: url,
             cancelURL: url
@@ -257,8 +257,8 @@ export default class Payline {
 
     // We get SOAP errors if nested objects are not initialized.
     manageWebWallet({ walletId, firstName, lastName, email, url }) {
-        firstName = firstName || "N/A";
-        lastName = lastName || "N/A";
+        firstName = firstName || 'N/A';
+        lastName = lastName || 'N/A';
         const contractNumber = this.contractNumber;
 
         const requestBody = {
@@ -268,12 +268,12 @@ export default class Payline {
                 firstName,
                 lastName,
                 email,
-                walletId,
+                walletId
             },
             contractNumber,
             selectedContractList: [{ selectedContract: contractNumber }],
             returnURL: url,
-            cancelURL: url,
+            cancelURL: url
         };
         return this.initialize()
             .then((client) =>
@@ -295,7 +295,7 @@ export default class Payline {
 
         const requestBody = {
             version,
-            token,
+            token
         };
 
         return this.initialize()
@@ -321,19 +321,19 @@ export default class Payline {
         amount,
         mode,
         differedActionDate,
-        action,
+        action
     }) {
-        firstName = firstName || "N/A";
-        lastName = lastName || "N/A";
+        firstName = firstName || 'N/A';
+        lastName = lastName || 'N/A';
 
         const contractNumber = this.contractNumber;
         const ref = walletId;
         const date = formatNow();
-        const currency = "978"; // Euros
-        const deliveryMode = "5"; // electronic ticketing
-        mode = mode || "CPT";
+        const currency = '978'; // Euros
+        const deliveryMode = '5'; // electronic ticketing
+        mode = mode || 'CPT';
         action = action || ACTIONS.AUTHORIZATION;
-        const country = "FR";
+        const country = 'FR';
         const shortDate = (d) =>
             formatDateWithTime(d).substring(0, 6) + formatDateWithTime(d).substring(8, 10);
 
@@ -343,8 +343,8 @@ export default class Payline {
             action,
             mode,
             differedActionDate:
-                mode === "DIF" ? shortDate(differedActionDate) : null,
-            contractNumber,
+                mode === 'DIF' ? shortDate(differedActionDate) : null,
+            contractNumber
         };
 
         const order = {
@@ -354,7 +354,7 @@ export default class Payline {
             currency,
             date,
             details: {},
-            deliveryMode,
+            deliveryMode
         };
 
         const requestBody = {
@@ -366,12 +366,12 @@ export default class Payline {
                 firstName,
                 lastName,
                 email,
-                walletId,
+                walletId
             },
             walletId,
             privateDataList: {},
             authentication3DSecure: {},
-            subMerchant: {},
+            subMerchant: {}
         };
         return this.initialize()
             .then((client) =>
@@ -393,20 +393,20 @@ export default class Payline {
         amount,
         differedActionDate,
         action,
-        mode,
+        mode
     }) {
         const contractNumber = this.contractNumber;
         const pseudorandomstring = randomString(
             13,
-            "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
         );
         const ref = `${walletId}-${pseudorandomstring}`;
         const date = formatNow();
-        const currency = "978"; // Euros
-        const deliveryMode = "5"; // electronic ticketing
+        const currency = '978'; // Euros
+        const deliveryMode = '5'; // electronic ticketing
         action = action || ACTIONS.AUTHORIZATION;
-        mode = mode || "CPT";
-        const country = "FR";
+        mode = mode || 'CPT';
+        const country = 'FR';
         const scheduledDate = formatDateWithTime(differedActionDate).substring(0, 10);
 
         const payment = {
@@ -414,7 +414,7 @@ export default class Payline {
             currency,
             mode,
             action,
-            contractNumber,
+            contractNumber
         };
 
         const order = {
@@ -424,7 +424,7 @@ export default class Payline {
             currency,
             date,
             details: {},
-            deliveryMode,
+            deliveryMode
         };
 
         const requestBody = {
@@ -435,7 +435,7 @@ export default class Payline {
             scheduledDate,
             privateDataList: {},
             authentication3DSecure: {},
-            subMerchant: {},
+            subMerchant: {}
         };
         return this.initialize()
             .then((client) =>
@@ -459,7 +459,7 @@ export default class Payline {
                     client.getWallet(
                         {
                             contractNumber: this.contractNumber,
-                            walletId,
+                            walletId
                         },
                         callback
                     );
@@ -483,7 +483,7 @@ export default class Payline {
                         {
                             version: 27,
                             contractNumber,
-                            paymentRecordId,
+                            paymentRecordId
                         },
                         callback
                     );
@@ -502,7 +502,7 @@ export default class Payline {
                     client.disablePaymentRecord(
                         {
                             contractNumber,
-                            paymentRecordId,
+                            paymentRecordId
                         },
                         callback
                     );
@@ -516,21 +516,21 @@ export default class Payline {
     makeWalletPayment(walletId, amount, currency = CURRENCIES.EUR) {
         const body = {
             payment: {
-                attributes: ns("payment"),
+                attributes: ns('payment'),
                 amount,
                 currency,
                 action: ACTIONS.PAYMENT,
-                mode: "CPT",
-                contractNumber: this.contractNumber,
+                mode: 'CPT',
+                contractNumber: this.contractNumber
             },
             order: {
-                attributes: ns("order"),
+                attributes: ns('order'),
                 ref: `order_${generateId()}`,
                 amount,
                 currency,
-                date: formatNow(),
+                date: formatNow()
             },
-            walletId,
+            walletId
         };
         return this.initialize()
             .then((client) =>
@@ -558,27 +558,27 @@ export default class Payline {
                     client.doAuthorization(
                         {
                             payment: {
-                                attributes: ns("payment"),
+                                attributes: ns('payment'),
                                 amount: tryAmount,
                                 currency,
                                 action: ACTIONS.AUTHORIZATION,
-                                mode: "CPT",
-                                contractNumber: this.contractNumber,
+                                mode: 'CPT',
+                                contractNumber: this.contractNumber
                             },
                             order: {
-                                attributes: ns("order"),
+                                attributes: ns('order'),
                                 ref: `order_${generateId()}`,
                                 amount: tryAmount,
                                 currency,
-                                date: formatNow(),
+                                date: formatNow()
                             },
                             card: {
-                                attributes: ns("card"),
+                                attributes: ns('card'),
                                 number: card.number,
                                 type: card.type,
                                 expirationDate: card.expirationDate,
-                                cvx: card.cvx,
-                            },
+                                cvx: card.cvx
+                            }
                         },
                         callback
                     );
@@ -590,7 +590,7 @@ export default class Payline {
                         client.doReset(
                             {
                                 transactionID: transaction.id,
-                                comment: "Card validation cleanup",
+                                comment: 'Card validation cleanup'
                             },
                             callback
                         )
@@ -604,27 +604,27 @@ export default class Payline {
     doAuthorization(reference, card, tryAmount, currency = CURRENCIES.EUR) {
         const body = {
             payment: {
-                attributes: ns("payment"),
+                attributes: ns('payment'),
                 amount: tryAmount,
                 currency,
                 action: ACTIONS.AUTHORIZATION,
-                mode: "CPT",
-                contractNumber: this.contractNumber,
+                mode: 'CPT',
+                contractNumber: this.contractNumber
             },
             order: {
-                attributes: ns("order"),
+                attributes: ns('order'),
                 ref: reference,
                 amount: tryAmount,
                 currency,
-                date: formatNow(),
+                date: formatNow()
             },
             card: {
-                attributes: ns("card"),
+                attributes: ns('card'),
                 number: card.number,
                 type: card.type,
                 expirationDate: card.expirationDate,
-                cvx: card.cvx,
-            },
+                cvx: card.cvx
+            }
         };
         return this.initialize()
             .then((client) =>
@@ -644,14 +644,14 @@ export default class Payline {
     doCapture(transactionID, tryAmount, currency = CURRENCIES.EUR) {
         const body = {
             payment: {
-                attributes: ns("payment"),
+                attributes: ns('payment'),
                 amount: tryAmount,
                 currency,
                 action: ACTIONS.VALIDATION,
-                mode: "CPT",
-                contractNumber: this.contractNumber,
+                mode: 'CPT',
+                contractNumber: this.contractNumber
             },
-            transactionID,
+            transactionID
         };
         return this.initialize()
             .then((client) =>
@@ -670,7 +670,7 @@ export default class Payline {
 
     doReset({ transactionID }) {
         const body = {
-            transactionID,
+            transactionID
         };
         return this.initialize()
             .then((client) =>
@@ -688,13 +688,13 @@ export default class Payline {
             version: 27,
             transactionID,
             payment: {
-                attributes: ns("payment"),
+                attributes: ns('payment'),
                 amount,
                 currency,
                 action: 421,
-                mode: "CPT",
-                contractNumber: this.contractNumber,
-            },
+                mode: 'CPT',
+                contractNumber: this.contractNumber
+            }
         };
         return this.initialize()
             .then((client) =>
@@ -711,8 +711,8 @@ export default class Payline {
         const body = {
             transactionID,
             orderRef,
-            transactionHistory: "Y",
-            archiveSearch: true,
+            transactionHistory: 'Y',
+            archiveSearch: true
         };
         if (startDate) {
             body.startDate = startDate;
@@ -738,49 +738,49 @@ export default class Payline {
         lastName,
         email,
         redirectURL,
-        notificationURL,
+        notificationURL
     }) {
-        firstName = firstName || "N/A";
-        lastName = lastName || "N/A";
+        firstName = firstName || 'N/A';
+        lastName = lastName || 'N/A';
         amount = Number.isNaN(Number(amount)) ? 100 : Number(amount);
 
         const contractNumber = this.contractNumber;
         const now = new Date().getTime();
         const ref = `${walletId}-${now}`;
         const date = formatNow();
-        const currency = "978"; // Euros
-        const deliveryMode = "5"; // electronic ticketing
-        const mode = "CPT";
+        const currency = '978'; // Euros
+        const deliveryMode = '5'; // electronic ticketing
+        const mode = 'CPT';
         const action = ACTIONS.AUTHORIZATION;
-        const country = "FR";
+        const country = 'FR';
 
         const payment = {
-            attributes: ns("payment"),
+            attributes: ns('payment'),
             amount,
             currency,
             action,
             mode,
-            contractNumber,
+            contractNumber
         };
 
         const order = {
-            attributes: ns("order"),
+            attributes: ns('order'),
             ref,
             country,
             amount,
             currency,
             date,
             details: {},
-            deliveryMode,
+            deliveryMode
         };
 
         const buyer = {
             ...defaultBody.buyer,
-            attributes: ns("buyer"),
+            attributes: ns('buyer'),
             firstName,
             lastName,
             email,
-            walletId,
+            walletId
         };
 
         const body = {
@@ -792,7 +792,7 @@ export default class Payline {
             returnURL: redirectURL,
             cancelURL: redirectURL,
             notificationURL,
-            securityMode: "SSL",
+            securityMode: 'SSL'
         };
 
         return this.initialize()
@@ -815,7 +815,7 @@ export default class Payline {
         endDate,
         transactionType,
         contractNumber,
-        returnCode,
+        returnCode
     }) {
         const version = 27;
 
@@ -825,7 +825,7 @@ export default class Payline {
             endDate,
             transactionType,
             contractNumber,
-            returnCode,
+            returnCode
         };
 
         return this.initialize()
@@ -845,10 +845,10 @@ Payline.CURRENCIES = CURRENCIES;
 function parseErrors(error) {
     const response = error.response;
     if (response.statusCode === 401) {
-        return Promise.reject({ shortMessage: "Wrong API credentials" });
+        return Promise.reject({ shortMessage: 'Wrong API credentials' });
     }
 
-    return Promise.reject({ shortMessage: "Wrong API call" });
+    return Promise.reject({ shortMessage: 'Wrong API call' });
 }
 
 function generateId() {
@@ -856,21 +856,21 @@ function generateId() {
 }
 
 function isSuccessful(result) {
-    return result && ["02500", "00000"].indexOf(result.code) !== -1;
+    return result && ['02500', '00000'].indexOf(result.code) !== -1;
 }
 
 function formatDateWithTime(originalDate) {
     // converting date to the Paris TZ since Payline does that, apparently.
     const paylineDate =
-        DateTime.fromJSDate(originalDate).setZone("Europe/Paris");
-    return paylineDate.toFormat("dd/LL/yyyy HH:mm");
+        DateTime.fromJSDate(originalDate).setZone('Europe/Paris');
+    return paylineDate.toFormat('dd/LL/yyyy HH:mm');
 }
 
 function formatShortDate(originalDate) {
     // converting date to the Paris TZ since Payline does that, apparently.
     const paylineDate =
-        DateTime.fromJSDate(originalDate).setZone("Europe/Paris");
-    return paylineDate.toFormat("dd/LL/yy");
+        DateTime.fromJSDate(originalDate).setZone('Europe/Paris');
+    return paylineDate.toFormat('dd/LL/yy');
 }
 
 function formatNow() {
@@ -879,8 +879,7 @@ function formatNow() {
 }
 
 function randomString(length, chars) {
-    var result = "";
-    for (var i = length; i > 0; --i)
-        result += chars[Math.round(Math.random() * (chars.length - 1))];
+    var result = '';
+    for (var i = length; i > 0; --i) { result += chars[Math.round(Math.random() * (chars.length - 1))]; }
     return result;
 }
